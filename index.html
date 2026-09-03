@@ -12,12 +12,6 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Courier+Prime:wght@700&family=Montserrat:wght@800;900&display=swap"
     rel="stylesheet" />
-  <link rel="preload" href="cabina.png" as="image" />
-  <link rel="preload" href="peron-neutral.png" as="image" />
-  <link rel="preload" href="peron-manos-arriba.png" as="image" />
-  <link rel="preload" href="vidrio.png" as="image" />
-  <link rel="preload" href="boleta-1951-reference.jpg" as="image" />
-  <link rel="preload" href="escudo-justicialista.svg" as="image" />
   <style>
     *,
     *::before,
@@ -106,6 +100,14 @@
       overflow: hidden;
       isolation: isolate;
       background: #000;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .machine-wrapper.is-ready {
+      opacity: 1;
+      transform: scale(1);
     }
 
     /* VISUAL LAYERS (BACK TO FRONT) */
@@ -1406,10 +1408,318 @@
       opacity: 0;
       transform: translateX(-50%) translateY(10px);
     }
+
+    /* =========================================================================
+       PRELOADER OVERLAY & PROGRESS COUNT
+    ========================================================================= */
+    .preloader-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: radial-gradient(circle at 50% 45%, #221006 0%, #0d0502 60%, #020100 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #ffe680;
+      overflow: hidden;
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 0.65s ease;
+      will-change: opacity, transform, filter;
+    }
+
+    .preloader-overlay.is-loaded {
+      opacity: 0;
+      transform: scale(1.03);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .preloader-ambient-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 45%, rgba(212, 167, 44, 0.22) 0%, transparent 70%);
+      animation: preloaderPulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes preloaderPulse {
+      0% { opacity: 0.6; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1.04); }
+    }
+
+    .preloader-card {
+      position: relative;
+      width: min(92vw, 440px);
+      background: linear-gradient(180deg, #1c0d05 0%, #100502 60%, #090301 100%);
+      border: 2px solid #8c6512;
+      border-radius: 12px;
+      padding: 30px 24px 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.95),
+        0 0 50px rgba(212, 167, 44, 0.18),
+        inset 0 0 25px rgba(0, 0, 0, 0.85);
+      outline: 1px solid rgba(255, 230, 128, 0.25);
+      outline-offset: 4px;
+    }
+
+    /* Antique corner filigree */
+    .preloader-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+    .preloader-corner-tl {
+      top: 6px;
+      left: 6px;
+      border-top: 2.5px solid #d4a72c;
+      border-left: 2.5px solid #d4a72c;
+    }
+    .preloader-corner-tr {
+      top: 6px;
+      right: 6px;
+      border-top: 2.5px solid #d4a72c;
+      border-right: 2.5px solid #d4a72c;
+    }
+    .preloader-corner-bl {
+      bottom: 6px;
+      left: 6px;
+      border-bottom: 2.5px solid #d4a72c;
+      border-left: 2.5px solid #d4a72c;
+    }
+    .preloader-corner-br {
+      bottom: 6px;
+      right: 6px;
+      border-bottom: 2.5px solid #d4a72c;
+      border-right: 2.5px solid #d4a72c;
+    }
+
+    .preloader-emblem {
+      width: 68px;
+      height: 68px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 0 16px rgba(255, 205, 70, 0.65));
+      animation: emblemFloat 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes emblemFloat {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-3px) scale(1.02); }
+    }
+
+    .preloader-sun {
+      width: 100%;
+      height: 100%;
+    }
+
+    .preloader-ribbon {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #74acdf;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      text-shadow: 0 0 10px rgba(116, 172, 223, 0.5);
+    }
+
+    .preloader-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2rem, 5vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #ffe680;
+      line-height: 1.1;
+      margin-bottom: 4px;
+      text-shadow: 0 0 25px rgba(255, 230, 128, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .preloader-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.86rem;
+      color: #d4a72c;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .preloader-counter-box {
+      margin-bottom: 14px;
+    }
+
+    .preloader-percent {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3.2rem, 8vw, 4.4rem);
+      line-height: 1;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, #ffffff 0%, #ffe680 40%, #d4a72c 75%, #8c6512 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 24px rgba(255, 205, 70, 0.55));
+      display: inline-block;
+    }
+
+    .preloader-meter-wrap {
+      width: 100%;
+      max-width: 340px;
+      margin-bottom: 14px;
+    }
+
+    .preloader-meter-track {
+      position: relative;
+      width: 100%;
+      height: 16px;
+      background: #080301;
+      border: 1.5px solid #8c6512;
+      border-radius: 20px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 10px rgba(212, 167, 44, 0.2);
+      overflow: hidden;
+      padding: 2px;
+    }
+
+    .preloader-meter-fill {
+      position: relative;
+      height: 100%;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #74acdf 0%, #d4a72c 40%, #ffe680 80%, #ffffff 100%);
+      background-size: 30px 30px;
+      box-shadow: 0 0 14px rgba(255, 230, 128, 0.8);
+      transition: width 0.12s linear;
+      min-width: 0%;
+      max-width: 100%;
+    }
+
+    .preloader-meter-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.25),
+        rgba(255, 255, 255, 0.25) 8px,
+        transparent 8px,
+        transparent 16px
+      );
+      animation: meterStripes 1s linear infinite;
+    }
+
+    @keyframes meterStripes {
+      0% { background-position: 0 0; }
+      100% { background-position: 32px 0; }
+    }
+
+    .preloader-status-text {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.85rem;
+      color: #ffe680;
+      letter-spacing: 0.8px;
+      min-height: 1.3em;
+      margin-bottom: 6px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+      transition: opacity 0.2s ease;
+    }
+
+    .preloader-bytes {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: rgba(212, 167, 44, 0.75);
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 
 <body>
+
+  <noscript>
+    <style>
+      .preloader-overlay { display: none !important; }
+      .machine-wrapper { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
+
+  <!-- PRELOADER OVERLAY WITH PERCENTAGE ENGINE -->
+  <div class="preloader-overlay" id="preloaderOverlay" role="status" aria-live="polite">
+    <div class="preloader-ambient-glow"></div>
+    <div class="preloader-card">
+      <div class="preloader-corner preloader-corner-tl"></div>
+      <div class="preloader-corner preloader-corner-tr"></div>
+      <div class="preloader-corner preloader-corner-bl"></div>
+      <div class="preloader-corner preloader-corner-br"></div>
+
+      <!-- SOL DE MAYO EMBLEM -->
+      <div class="preloader-emblem">
+        <svg class="preloader-sun" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <radialGradient id="sunFaceGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff8d6" />
+              <stop offset="55%" stop-color="#f5b000" />
+              <stop offset="100%" stop-color="#b87a00" />
+            </radialGradient>
+            <linearGradient id="sunRayGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffe680" />
+              <stop offset="100%" stop-color="#d4a72c" />
+            </linearGradient>
+          </defs>
+          <g stroke="url(#sunRayGrad)" stroke-width="2.6" stroke-linecap="round">
+            <line x1="50" y1="5" x2="50" y2="22" />
+            <line x1="50" y1="78" x2="50" y2="95" />
+            <line x1="5" y1="50" x2="22" y2="50" />
+            <line x1="78" y1="50" x2="95" y2="50" />
+            <line x1="18" y1="18" x2="30" y2="30" />
+            <line x1="70" y1="70" x2="82" y2="82" />
+            <line x1="18" y1="82" x2="30" y2="70" />
+            <line x1="70" y1="30" x2="82" y2="18" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(22.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(67.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(112.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(157.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(202.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(247.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(292.5 50 50)" />
+            <path d="M 50 22 Q 47 13 50 8 Q 53 13 50 22" fill="url(#sunRayGrad)" stroke="none" transform="rotate(337.5 50 50)" />
+          </g>
+          <circle cx="50" cy="50" r="18" fill="url(#sunFaceGrad)" stroke="#5e3906" stroke-width="1.2" />
+          <ellipse cx="44" cy="47" rx="1.8" ry="2.2" fill="#2d1702" />
+          <ellipse cx="56" cy="47" rx="1.8" ry="2.2" fill="#2d1702" />
+          <path d="M 42 43 Q 44 41 46 43" stroke="#4a2a06" stroke-width="1" fill="none" />
+          <path d="M 54 43 Q 56 41 58 43" stroke="#4a2a06" stroke-width="1" fill="none" />
+          <path d="M 50 47 L 49 52 L 51 52" stroke="#4a2a06" stroke-width="1" fill="none" />
+          <path d="M 44 56 Q 50 61 56 56" stroke="#2d1702" stroke-width="1.4" fill="none" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <div class="preloader-ribbon">REPÚBLICA ARGENTINA</div>
+      <div class="preloader-title">PERÓN</div>
+      <div class="preloader-subtitle">LA MÁQUINA DE LA CONDUCCIÓN POLÍTICA</div>
+
+      <div class="preloader-counter-box">
+        <span class="preloader-percent" id="preloaderPercent">0%</span>
+      </div>
+
+      <div class="preloader-meter-wrap">
+        <div class="preloader-meter-track">
+          <div class="preloader-meter-fill" id="preloaderMeterFill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="preloader-status-text" id="preloaderStatus">Iniciando maquinaria doctrinaria...</div>
+      <div class="preloader-bytes" id="preloaderBytes">0.0 MB / 80.0 MB</div>
+    </div>
+  </div>
 
   <div class="ambient-glow"></div>
 
@@ -1418,10 +1728,10 @@
 
   <div class="machine-wrapper" id="machineWrapper">
     <!-- LAYER 1: PERÓN NEUTRAL (REST STATE) -->
-    <img src="peron-neutral.png" alt="" aria-hidden="true" class="peron-layer peron-neutral" id="peronNeutral" />
+    <img src="peron-neutral.png" data-src="peron-neutral.png" alt="" aria-hidden="true" class="peron-layer peron-neutral" id="peronNeutral" />
 
     <!-- LAYER 2: PERÓN HANDS UP (TICKET DELIVERY & CELEBRATION REACTION) -->
-    <img src="peron-manos-arriba.png" alt="" aria-hidden="true" class="peron-layer peron-hands-up" id="peronHandsUp" />
+    <img src="peron-manos-arriba.png" data-src="peron-manos-arriba.png" alt="" aria-hidden="true" class="peron-layer peron-hands-up" id="peronHandsUp" />
 
     <!-- LAYER 3: CABIN INTERIOR STAGE (LIGHTS, DUST, STEAM & EYES - LOCATED INSIDE BOOTH BEHIND SMOKE!) -->
     <div class="cabin-interior-stage" id="cabinInteriorStage">
@@ -1454,10 +1764,10 @@
     </div>
 
     <!-- LAYER 5: GLASS TEXTURE ON CENTRAL APERTURE -->
-    <img src="vidrio.png" alt="" aria-hidden="true" class="glass-layer" id="glassLayer" />
+    <img src="vidrio.png" data-src="vidrio.png" alt="" aria-hidden="true" class="glass-layer" id="glassLayer" />
 
     <!-- LAYER 6: FRONT CABIN WITH CENTRAL TRANSPARENCY & CHROME FRAME -->
-    <img src="cabina.png" alt="" aria-hidden="true" class="cabin-layer" id="cabinLayer" />
+    <img src="cabina.png" data-src="cabina.png" alt="" aria-hidden="true" class="cabin-layer" id="cabinLayer" />
 
     <!-- LAYER 7: FRONT INTERACTIVE CONTROLS (OUTSIDE BOOTH) -->
     <div class="interactive-stage" id="interactiveStage">
@@ -2067,9 +2377,192 @@
     const smokeCtx = smokeCanvas.getContext('2d');
     const smokeVeil = document.getElementById('smokeVeil');
 
-    // Pre-decode both pose images
-    if (peronNeutralImg && peronNeutralImg.decode) peronNeutralImg.decode().catch(() => {});
-    if (peronHandsUpImg && peronHandsUpImg.decode) peronHandsUpImg.decode().catch(() => {});
+    /* =========================================================================
+       ASSET PRELOADER WITH REAL-TIME PERCENTAGE ENGINE
+    ========================================================================= */
+    const PRELOAD_ASSETS = [
+      { id: 'cabin', url: 'cabina.png', size: 21731794, elementId: 'cabinLayer' },
+      { id: 'peronNeutral', url: 'peron-neutral.png', size: 26610941, elementId: 'peronNeutral' },
+      { id: 'peronHands', url: 'peron-manos-arriba.png', size: 26377354, elementId: 'peronHandsUp' },
+      { id: 'glass', url: 'vidrio.png', size: 5175553, elementId: 'glassLayer' },
+      { id: 'boleta', url: 'boleta-1951-reference.jpg', size: 84805 },
+      { id: 'escudo', url: 'escudo-justicialista.svg', size: 14184 }
+    ];
+
+    const TOTAL_ASSET_BYTES = PRELOAD_ASSETS.reduce((sum, a) => sum + a.size, 0); // 79,994,631 bytes
+    const TOTAL_ASSET_MB = (TOTAL_ASSET_BYTES / 1000000).toFixed(1); // 80.0 MB
+
+    const preloaderOverlay = document.getElementById('preloaderOverlay');
+    const preloaderPercent = document.getElementById('preloaderPercent');
+    const preloaderMeterFill = document.getElementById('preloaderMeterFill');
+    const preloaderStatus = document.getElementById('preloaderStatus');
+    const preloaderBytes = document.getElementById('preloaderBytes');
+
+    const assetLoadedBytes = new Map();
+    PRELOAD_ASSETS.forEach(a => assetLoadedBytes.set(a.url, 0));
+
+    let visualPercent = 0;
+    let targetPercent = 0;
+    let isPreloadDone = false;
+    let tickerRaf = null;
+
+    function updatePreloaderDisplay() {
+      // Smooth continuous interpolation towards targetPercent
+      const diff = targetPercent - visualPercent;
+      if (Math.abs(diff) < 0.15) {
+        visualPercent = targetPercent;
+      } else {
+        visualPercent += diff * 0.14;
+      }
+
+      const intVal = Math.min(100, Math.floor(visualPercent));
+      if (preloaderPercent) preloaderPercent.textContent = intVal + '%';
+      if (preloaderMeterFill) preloaderMeterFill.style.width = Math.min(100, visualPercent).toFixed(1) + '%';
+
+      const currentMB = (Math.min(100, visualPercent) / 100 * (TOTAL_ASSET_BYTES / 1000000)).toFixed(1);
+      if (preloaderBytes) preloaderBytes.textContent = `${currentMB} MB / ${TOTAL_ASSET_MB} MB`;
+
+      // Status messages reflecting the mechanical activation of the machine
+      if (!isPreloadDone && preloaderStatus) {
+        if (intVal < 20) {
+          preloaderStatus.textContent = 'Encendiendo filamentos de la cabina...';
+        } else if (intVal < 45) {
+          preloaderStatus.textContent = 'Cargando placas fotográficas de Perón...';
+        } else if (intVal < 70) {
+          preloaderStatus.textContent = 'Presurizando caldera y calibrando ranura...';
+        } else if (intVal < 90) {
+          preloaderStatus.textContent = 'Preparando boletas de conducción política...';
+        } else {
+          preloaderStatus.textContent = 'Sincronizando mirada del General...';
+        }
+      }
+
+      if (visualPercent < 99.8 || !isPreloadDone) {
+        tickerRaf = requestAnimationFrame(updatePreloaderDisplay);
+      } else {
+        finishPreloader();
+      }
+    }
+
+    function refreshTargetPercent() {
+      let currentTotal = 0;
+      for (const bytes of assetLoadedBytes.values()) {
+        currentTotal += bytes;
+      }
+      const pct = Math.min(100, (currentTotal / TOTAL_ASSET_BYTES) * 100);
+      if (pct > targetPercent) {
+        targetPercent = pct;
+      }
+    }
+
+    async function loadAssetItem(asset) {
+      try {
+        const res = await fetch(asset.url);
+        if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+        const reader = res.body.getReader();
+        const chunks = [];
+        let received = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          assetLoadedBytes.set(asset.url, received);
+          refreshTargetPercent();
+        }
+
+        assetLoadedBytes.set(asset.url, asset.size);
+        refreshTargetPercent();
+
+        const blob = new Blob(chunks);
+        const objectUrl = URL.createObjectURL(blob);
+        return { asset, objectUrl };
+      } catch (err) {
+        // Fallback for file:// or fetch blocking: load via Image
+        return new Promise(resolve => {
+          const img = new Image();
+          let simulated = 0;
+          const timer = setInterval(() => {
+            if (simulated < asset.size * 0.85) {
+              simulated += asset.size * 0.12;
+              assetLoadedBytes.set(asset.url, simulated);
+              refreshTargetPercent();
+            }
+          }, 60);
+
+          img.onload = img.onerror = () => {
+            clearInterval(timer);
+            assetLoadedBytes.set(asset.url, asset.size);
+            refreshTargetPercent();
+            resolve({ asset, objectUrl: asset.url });
+          };
+          img.src = asset.url;
+        });
+      }
+    }
+
+    async function runPreloader() {
+      tickerRaf = requestAnimationFrame(updatePreloaderDisplay);
+
+      const results = await Promise.all(PRELOAD_ASSETS.map(loadAssetItem));
+
+      // Connect object URLs to DOM elements
+      for (const { asset, objectUrl } of results) {
+        if (asset.elementId) {
+          const el = document.getElementById(asset.elementId);
+          if (el && objectUrl) {
+            el.src = objectUrl;
+          }
+        }
+      }
+
+      // Ensure all machine visual layers are completely decoded in memory
+      const decodePromises = ['cabinLayer', 'peronNeutral', 'peronHandsUp', 'glassLayer']
+        .map(id => document.getElementById(id))
+        .filter(el => el && el.decode)
+        .map(el => el.decode().catch(() => {}));
+
+      await Promise.all(decodePromises);
+
+      // Trigger 100% completion
+      targetPercent = 100;
+      isPreloadDone = true;
+    }
+
+    function finishPreloader() {
+      if (tickerRaf) cancelAnimationFrame(tickerRaf);
+      if (preloaderPercent) preloaderPercent.textContent = '100%';
+      if (preloaderMeterFill) preloaderMeterFill.style.width = '100%';
+      if (preloaderBytes) preloaderBytes.textContent = `${TOTAL_ASSET_MB} MB / ${TOTAL_ASSET_MB} MB`;
+      if (preloaderStatus) preloaderStatus.textContent = '— ¡MAQUINARIA LISTA, COMPAÑERO! —';
+
+      setTimeout(() => {
+        if (preloaderOverlay) preloaderOverlay.classList.add('is-loaded');
+        if (machineWrapper) machineWrapper.classList.add('is-ready');
+
+        if (typeof resizeCanvases === 'function') {
+          resizeCanvases();
+        }
+
+        setTimeout(() => {
+          if (preloaderOverlay && preloaderOverlay.parentNode) {
+            preloaderOverlay.parentNode.removeChild(preloaderOverlay);
+          }
+        }, 700);
+      }, 350);
+    }
+
+    // Safety timeout to ensure page is never stuck
+    setTimeout(() => {
+      if (!isPreloadDone) {
+        targetPercent = 100;
+        isPreloadDone = true;
+      }
+    }, 18000);
+
+    // Initialize asset preloading
+    runPreloader();
 
     let isConsulting = false;
     let memorySeenQuoteIds = [];
