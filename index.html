@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PERÓN — La Máquina de la Conducción Política</title>
+  <meta name="description"
+    content="La legendaria máquina animatrónica de la fortuna de Juan Domingo Perón. Consultá tu destino y recibí tu doctrina de conducción." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Courier+Prime:wght@700&family=Montserrat:wght@800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="preload" href="cabina.png" as="image" />
+  <link rel="preload" href="peron-neutral.png" as="image" />
+  <link rel="preload" href="peron-manos-arriba.png" as="image" />
+  <link rel="preload" href="vidrio.png" as="image" />
+  <link rel="preload" href="boleta-1951-reference.jpg" as="image" />
+  <link rel="preload" href="escudo-justicialista.svg" as="image" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --gold-bright: #ffe680;
+      --gold-mid: #d4a72c;
+      --gold-dark: #8c6512;
+      --wood-dark: #120601;
+      --lamp-glow: rgba(255, 205, 70, 0.85);
+      --celeste-arg: #74acdf;
+      --celeste-dark: #2a6fb0;
+      --celeste-light: #e8f3fc;
+      --sun-yellow: #f5b000;
+      --offwhite-ticket: #faf9f5;
+      --glass-opacity: 0.38;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #040201;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      background: radial-gradient(ellipse at 50% 35%, #1c0e05 0%, #0a0402 60%, #020100 100%);
+      min-height: 100dvh;
+    }
+
+    /* Ambient atmosphere & back glow */
+    .ambient-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 45%, rgba(212, 167, 44, 0.12) 0%, transparent 65%);
+      z-index: 1;
+    }
+
+    /* DARK BACKDROP OVERLAY (ONLY WHEN TICKET IS ZOOMED FOR CLOSE-UP READING) */
+    .ticket-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 2, 1, 0.82);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ticket-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* MACHINE MAIN CONTAINER */
+    .machine-wrapper {
+      position: relative;
+      width: min(100vw, 55.814dvh, 547px);
+      height: auto;
+      max-height: 100dvh;
+      aspect-ratio: 3072 / 5504;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      box-shadow:
+        0 20px 70px rgba(0, 0, 0, 0.98),
+        0 0 90px rgba(212, 167, 44, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      isolation: isolate;
+      background: #000;
+    }
+
+    /* VISUAL LAYERS (BACK TO FRONT) */
+    .peron-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 220ms ease-out, transform 220ms ease-out, filter 220ms ease-out;
+    }
+
+    .peron-neutral {
+      z-index: 10;
+      opacity: 1;
+      transform: translateY(0);
+      filter: brightness(1);
+    }
+
+    .peron-hands-up {
+      z-index: 11;
+      opacity: 0;
+      transform: translateY(0);
+      filter: brightness(1);
+    }
+
+    /* PERÓN BRAZOS ARRIBA STATE */
+    .machine-wrapper.peron-celebrating .peron-neutral {
+      opacity: 0;
+    }
+
+    .machine-wrapper.peron-celebrating .peron-hands-up {
+      opacity: 1;
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .peron-layer {
+        transition: opacity 100ms ease-out;
+      }
+      .machine-wrapper.peron-celebrating .peron-hands-up {
+        transform: none;
+        filter: none;
+      }
+    }
+
+    /* =========================================================================
+       LAYER 3: CABIN INTERIOR STAGE (LIGHTS, PARTICLES & EYES)
+       LOCATED INSIDE THE BOOTH, BEHIND THE SMOKE CHAMBER!
+    ========================================================================= */
+    .cabin-interior-stage {
+      position: absolute;
+      left: 14.91%;
+      top: 25.58%;
+      width: 69.92%;
+      height: 43.55%;
+      pointer-events: none;
+      z-index: 15; /* BEHIND SMOKE (SMOKE IS 22) */
+    }
+
+    /* WARM LAMP GLOWS (PRECISELY ON SCONCES: LEFT X=20.8%, RIGHT X=79.2%, Y=40.0% OF MACHINE)
+       Relative to .cabin-interior-stage (left 14.91%, top 25.58%, width 69.92%, height 43.55%):
+       Left lamp inside stage: (20.8% - 14.91%) / 69.92% = 8.42%
+       Right lamp inside stage: (79.2% - 14.91%) / 69.92% = 91.95%
+       Lamp Y inside stage: (40.0% - 25.58%) / 43.55% = 33.11% */
+    .lamp-glow {
+      position: absolute;
+      width: 13.5%;
+      height: 16.5%;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+      background: radial-gradient(ellipse at center, rgba(255, 250, 195, 0.98) 0%, rgba(255, 190, 60, 0.78) 42%, rgba(255, 130, 20, 0.35) 75%, transparent 100%);
+      filter: drop-shadow(0 0 10px rgba(255, 190, 50, 0.85));
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .lamp-glow::after {
+      content: '';
+      position: absolute;
+      inset: -65%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(255, 210, 80, 0.45) 0%, rgba(255, 150, 30, 0.18) 50%, transparent 72%);
+      pointer-events: none;
+    }
+
+    .lamp-glow.left {
+      top: 33.11%;
+      left: 8.42%;
+      animation: flameFlickerL 2.6s infinite alternate ease-in-out;
+    }
+
+    .lamp-glow.right {
+      top: 33.11%;
+      left: 91.95%;
+      animation: flameFlickerR 2.9s infinite alternate ease-in-out;
+    }
+
+    @keyframes flameFlickerL {
+      0% {
+        opacity: 0.65;
+        transform: translate(-50%, -50%) scale(0.96);
+      }
+      50% {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(1.05);
+      }
+      100% {
+        opacity: 0.75;
+        transform: translate(-50%, -50%) scale(1.0);
+      }
+    }
+
+    @keyframes flameFlickerR {
+      0% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1.02);
+      }
+      50% {
+        opacity: 1.0;
+        transform: translate(-50%, -50%) scale(0.95);
+      }
+      100% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.04);
+      }
+    }
+
+    .machine-wrapper.active-consultation .lamp-glow {
+      animation: lampActive 0.12s infinite alternate !important;
+    }
+
+    @keyframes lampActive {
+      0% {
+        opacity: 0.45;
+        transform: translate(-50%, -50%) scale(0.92);
+        filter: drop-shadow(0 0 8px rgba(255, 160, 20, 0.6));
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.28);
+        filter: drop-shadow(0 0 24px rgba(255, 220, 60, 1));
+      }
+    }
+
+    /* EYE TRACKING LAYER (EXACT EYE CENTERS: LEFT X=47.36%, RIGHT X=53.39%, Y=38.10% OF MACHINE)
+       Relative to .cabin-interior-stage (left 14.91%, top 25.58%, width 69.92%, height 43.55%):
+       Left eye inside stage: (47.36% - 14.91%) / 69.92% = 46.41%
+       Right eye inside stage: (53.39% - 14.91%) / 69.92% = 55.03%
+       Eyes Y inside stage: (38.10% - 25.58%) / 43.55% = 28.75%
+       BEHIND THE SMOKE! */
+    .eye-track {
+      position: absolute;
+      width: 3.2%;
+      height: 1.7%;
+      border-radius: 50%;
+      overflow: hidden;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+
+    .eye-track.left {
+      top: 28.75%;
+      left: 46.41%;
+    }
+
+    .eye-track.right {
+      top: 28.75%;
+      left: 55.03%;
+    }
+
+    /* Subtle specular reflection following mouse (no opaque blobs) */
+    .pupil-point {
+      position: absolute;
+      top: 20%;
+      left: 30%;
+      width: 38%;
+      height: 60%;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 45%, transparent 70%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      transition: transform 0.05s ease-out;
+    }
+
+    .eyelid-overlay {
+      position: absolute;
+      inset: 0;
+      background: #c38765;
+      height: 0%;
+      z-index: 2;
+      transition: height 0.09s cubic-bezier(0.4, 0, 0.2, 1);
+      border-bottom: 0.5px solid #6b371b;
+    }
+
+    .blinking .eyelid-overlay {
+      height: 100% !important;
+    }
+
+    /* STEAM RISING FROM THE PAVA (KETTLE) */
+    .steam-canvas {
+      position: absolute;
+      top: 32%;
+      left: 3%;
+      width: 28%;
+      height: 55%;
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
+    /* DUST PARTICLES IN GLASS CABINET */
+    .dust-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    /* =========================================================================
+       LAYER 4: CABIN SMOKE CHAMBER (IN FRONT OF LIGHTS & EYES; BEHIND GLASS & CABIN)
+       TRANSLUCENT VOLUMETRIC ATMOSPHERIC SMOKE
+    ========================================================================= */
+    .smoke-chamber {
+      position: absolute;
+      left: 14.91%;
+      top: 25.58%;
+      width: 69.92%;
+      height: 43.55%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 22; /* IN FRONT OF LIGHTS AND EYES (15), BEHIND GLASS (24) AND CABIN FRAME (30) */
+      border-radius: 4px;
+    }
+
+    .smoke-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    /* Translucent soft fog haze veil */
+    .smoke-veil {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 60%, rgba(255, 250, 238, 0.55) 0%, rgba(246, 238, 222, 0.42) 48%, rgba(228, 216, 196, 0.25) 78%, transparent 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+      mix-blend-mode: screen;
+      filter: blur(8px);
+    }
+
+    /* Translucent billowing fog clusters */
+    .smoke-billows {
+      position: absolute;
+      inset: -15%;
+      background:
+        radial-gradient(circle at 35% 65%, rgba(255, 252, 245, 0.45) 0%, transparent 45%),
+        radial-gradient(circle at 65% 55%, rgba(255, 250, 240, 0.45) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(250, 242, 228, 0.40) 0%, transparent 50%);
+      opacity: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      transition: opacity 0.6s ease-in-out, transform 2.4s ease-out;
+      transform: scale(0.92) translateY(12px);
+    }
+
+    .smoke-chamber.is-smoking .smoke-billows {
+      opacity: 0.75;
+      transform: scale(1.12) translateY(-10px);
+    }
+
+    /* LAYER 5: GLASS TEXTURE LAYER */
+    .glass-layer {
+      position: absolute;
+      left: 14.91%;
+      top: 25.58%;
+      width: 69.92%;
+      height: 43.55%;
+      object-fit: fill;
+      mix-blend-mode: screen;
+      opacity: var(--glass-opacity, 0.38);
+      pointer-events: none;
+      user-select: none;
+      z-index: 24;
+    }
+
+    /* LAYER 6: CABIN LAYER (FRONT ARCHITECTURE & FRAME) */
+    .cabin-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      pointer-events: none;
+      user-select: none;
+      z-index: 30;
+    }
+
+    /* LAYER 7: FRONT INTERACTIVE CONTROLS CONTAINER (OUTSIDE BOOTH) */
+    .interactive-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 40;
+    }
+
+    /* CONSULTATION PLATE: PEARL, CHROME AND LEATHER */
+    .consultation-panel {
+      position: absolute;
+      top: 72.4%;
+      left: 50%;
+      width: 68%;
+      transform: translateX(-50%);
+      z-index: 42;
+      padding: clamp(5px, 1.2vw, 8px);
+      border: 2px solid #bfc4c8;
+      border-radius: 11px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 35%),
+        linear-gradient(180deg, #4c1115 0%, #26070a 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 239, 184, 0.35),
+        inset 0 -7px 14px rgba(0, 0, 0, 0.38),
+        0 5px 14px rgba(0, 0, 0, 0.72),
+        0 0 0 1px #6d4d24;
+      transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+    }
+
+    .consultation-panel.is-hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(26px) scale(0.92);
+      pointer-events: none;
+    }
+
+    .consultation-panel::before,
+    .consultation-panel::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff3b0, #8c6512 65%, #2a1403);
+      box-shadow: 0 1px 2px #000;
+      transform: translateY(-50%);
+    }
+
+    .consultation-panel::before { left: 4px; }
+    .consultation-panel::after { right: 4px; }
+
+    .consultation-label {
+      display: block;
+      margin: 0 10px 4px;
+      color: #ffe7a0;
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(7px, 1.8vw, 10px);
+      letter-spacing: 1.2px;
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 0 1px 2px #000;
+    }
+
+    .consultation-input {
+      width: 100%;
+      min-height: clamp(37px, 7.2vw, 48px);
+      max-height: 54px;
+      resize: none;
+      border: 1px solid #8b764d;
+      border-radius: 6px;
+      outline: none;
+      padding: 7px 9px;
+      color: #231306;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.78), transparent 24%),
+        linear-gradient(135deg, #fffdf2 0%, #e7d9bb 48%, #fff8df 100%);
+      box-shadow:
+        inset 0 2px 5px rgba(55, 31, 5, 0.3),
+        0 0 0 2px rgba(17, 17, 17, 0.72);
+      font-family: 'Courier Prime', monospace;
+      font-size: clamp(10px, 2.5vw, 13px);
+      line-height: 1.2;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+
+    .consultation-input::placeholder { color: #766649; opacity: 0.85; }
+
+    .consultation-input:focus {
+      border-color: #ffe680;
+      box-shadow:
+        inset 0 2px 5px rgba(55, 31, 5, 0.28),
+        0 0 0 2px #111,
+        0 0 12px rgba(255, 214, 90, 0.72);
+    }
+
+    .consultation-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 4px 8px 0;
+      color: #e4c985;
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(6px, 1.45vw, 8px);
+      letter-spacing: 0.55px;
+    }
+
+    /* MASSIVE INTERACTIVE BUTTON OVERLAY ("INSERTAR AGUINALDO") */
+    .btn-target-area {
+      position: absolute;
+      top: 83.5%;
+      left: 39.5%;
+      width: 21%;
+      height: 11.5%;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 43;
+      outline: none;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pulsing highlight around button */
+    .btn-halo {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 220, 80, 0.35) 0%, rgba(212, 167, 44, 0.1) 65%, transparent 75%);
+      opacity: 0.5;
+      animation: btnPulse 2s infinite alternate ease-in-out;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    @keyframes btnPulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.3;
+      }
+      100% {
+        transform: scale(1.08);
+        opacity: 0.75;
+      }
+    }
+
+    .btn-target-area:hover .btn-halo {
+      opacity: 0.9;
+      transform: scale(1.12);
+    }
+
+    .btn-target-area:active .btn-halo,
+    .btn-target-area.pressed .btn-halo {
+      transform: scale(0.92);
+      opacity: 1;
+      background: radial-gradient(circle, rgba(255, 240, 120, 0.6) 0%, rgba(255, 170, 20, 0.3) 70%, transparent 80%);
+    }
+
+    .btn-target-area:disabled {
+      cursor: not-allowed;
+    }
+
+    .btn-target-area:disabled .btn-halo {
+      animation: none;
+      opacity: 0.13;
+      filter: grayscale(0.8);
+    }
+
+    .machine-wrapper.has-question .btn-halo {
+      opacity: 0.82;
+      box-shadow: 0 0 18px rgba(255, 220, 80, 0.38);
+    }
+
+    /* 3D Falling Coin Animation into Slot */
+    .falling-coin {
+      position: absolute;
+      top: 75%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff5b8 0%, #e6b422 55%, #8f6008 100%);
+      border: 2px solid #fff2a8;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 215, 80, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: #4a2e05;
+      z-index: 44;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .falling-coin.drop {
+      animation: coinPlunge 0.65s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+    }
+
+    @keyframes coinPlunge {
+      0% {
+        top: 72%;
+        transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+        opacity: 1;
+      }
+      60% {
+        top: 86%;
+        transform: translate(-50%, -50%) scale(0.9) rotate(220deg);
+        opacity: 1;
+      }
+      100% {
+        top: 89%;
+        transform: translate(-50%, -50%) scale(0.25) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* =========================================================================
+       SLOT DISPENSER & TICKET EMERGENCE (AT REAL MACHINE APERTURE Y=74.8%)
+    ========================================================================= */
+    .slot-dispenser {
+      position: absolute;
+      top: 74.8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 65%;
+      max-width: 345px;
+      z-index: 45;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .slot-chute {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      padding-top: 1px;
+    }
+
+    .slot-chute::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 2%;
+      right: 2%;
+      height: 6px;
+      z-index: 8;
+      pointer-events: none;
+      background: linear-gradient(180deg, #070504 0%, #21140f 45%, #8a7060 72%, #120b08 100%);
+      border-radius: 0 0 50% 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.88), inset 0 -1px 0 rgba(255, 239, 207, 0.2);
+    }
+
+    .slot-dispenser.is-dispensed .slot-chute {
+      overflow: visible;
+    }
+
+    .slot-dispenser.is-active {
+      pointer-events: auto;
+    }
+
+    /* The ticket itself */
+    .vintage-ticket {
+      position: relative;
+      background-color: var(--offwhite-ticket);
+      background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(116, 172, 223, 0.16) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(245, 176, 0, 0.12) 0%, transparent 45%),
+        linear-gradient(180deg, #ffffff 0%, #f7f9fb 40%, #edf3f8 100%);
+      border: 2px solid #2a6fb0;
+      outline: 1.5px dashed #f5b000;
+      outline-offset: -5px;
+      border-radius: 6px;
+      padding: 9px 12px 8px;
+      box-shadow:
+        0 14px 35px rgba(0, 0, 0, 0.92),
+        0 0 20px rgba(116, 172, 223, 0.35);
+      color: #111827;
+      transform: translateY(-102%);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.18, 1, 0.28, 1), box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    /* Dispensing animation coming physically down out of the slit */
+    .slot-dispenser.is-dispensing .vintage-ticket {
+      opacity: 1;
+      transform-origin: top center;
+      will-change: transform, clip-path, opacity;
+      animation: ticketEmergeDownwards 4.6s cubic-bezier(0.14, 0.68, 0.2, 1) forwards;
+    }
+
+    @keyframes ticketEmergeDownwards {
+      0% {
+        transform: translateY(0) scaleX(0.16) scaleY(0.08);
+        clip-path: inset(0 0 94% 0 round 1px);
+        opacity: 0;
+      }
+      7% {
+        transform: translateY(0) scaleX(0.22) scaleY(0.16);
+        clip-path: inset(0 0 85% 0 round 1px);
+        opacity: 1;
+      }
+      18% {
+        transform: translateY(0) scaleX(0.48) scaleY(0.34) skewX(-0.7deg);
+        clip-path: inset(0 0 68% 0 round 1px);
+      }
+      34% {
+        transform: translateY(0) scaleX(0.88) scaleY(0.57) skewX(0.9deg);
+        clip-path: inset(0 0 45% 0 round 1px);
+      }
+      50% {
+        transform: translateY(0) scaleX(1.055) scaleY(0.74) skewX(-0.45deg);
+        clip-path: inset(0 0 28% 0 round 1px);
+      }
+      67% {
+        transform: translateY(0) scaleX(0.972) scaleY(0.88) skewX(0.25deg);
+        clip-path: inset(0 0 14% 0 round 1px);
+      }
+      82% {
+        transform: translateY(0) scaleX(1.018) scaleY(0.975);
+        clip-path: inset(0 0 4% 0 round 1px);
+      }
+      93% {
+        transform: translateY(2px) scaleX(0.992) scaleY(1.018);
+        clip-path: inset(0 0 0 0 round 1px);
+      }
+      100% {
+        transform: translateY(0) scaleX(1) scaleY(1);
+        clip-path: inset(0 0 0 0 round 1px);
+        opacity: 1;
+      }
+    }
+
+    .slot-dispenser.is-dispensed .vintage-ticket {
+      transform: translateY(0%);
+      opacity: 1;
+    }
+
+    /* Decorative Celeste Side Banners */
+    .ticket-side-accent-left,
+    .ticket-side-accent-right {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3.5px;
+      background: linear-gradient(180deg, #74acdf 0%, #ffffff 50%, #74acdf 100%);
+      pointer-events: none;
+    }
+
+    .ticket-side-accent-left { left: 0; }
+    .ticket-side-accent-right { right: 0; }
+
+    /* Official Argentine Seal / Stamp */
+    .rubber-stamp {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 60px;
+      height: 60px;
+      border: 1.6px dashed #2a6fb0;
+      border-radius: 50%;
+      transform: rotate(-12deg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #1a4f80;
+      font-family: 'Special Elite', cursive;
+      font-size: 5.5px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      line-height: 1.15;
+      pointer-events: none;
+      z-index: 5;
+      background: rgba(116, 172, 223, 0.08);
+      box-shadow: inset 0 0 0 1.5px rgba(245, 176, 0, 0.4);
+      text-transform: uppercase;
+    }
+
+    .rubber-stamp .stamp-sun {
+      font-size: 10px;
+      color: #f5b000;
+      line-height: 1;
+      margin-bottom: 1px;
+    }
+
+    .rubber-stamp::after {
+      content: '★ HOMOLOGADO ★';
+      font-size: 4.8px;
+      margin-top: 1px;
+      color: #111827;
+      font-weight: 900;
+    }
+
+    .ticket-header {
+      text-align: center;
+      border-bottom: 1.5px solid #2a6fb0;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .ticket-header::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: #f5b000;
+    }
+
+    .ticket-top-sun {
+      font-size: 12px;
+      color: #f5b000;
+      line-height: 1;
+      margin-bottom: 1px;
+    }
+
+    .ticket-main-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(8.5px, 2.3vw, 10.5px);
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 1.6px;
+    }
+
+    .ticket-main-title .star-yellow {
+      color: #f5b000;
+      margin: 0 1px;
+    }
+
+    .ticket-sub-title {
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(5.8px, 1.6vw, 7px);
+      color: #2a6fb0;
+      letter-spacing: 1.3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .ticket-body {
+      margin: 6px 0 5px;
+      position: relative;
+      z-index: 6;
+    }
+
+    .ticket-quote {
+      font-family: 'IM Fell English', serif;
+      font-size: clamp(11px, 2.6vw, 12.5px);
+      font-style: italic;
+      color: #090d16;
+      text-align: center;
+      line-height: 1.32;
+      padding: 0 4px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+    }
+
+    .ticket-quote::before {
+      content: '“';
+      font-size: 16px;
+      color: #2a6fb0;
+      margin-right: 3px;
+      font-family: 'Playfair Display', serif;
+      vertical-align: -2px;
+    }
+
+    .ticket-quote::after {
+      content: '”';
+      font-size: 16px;
+      color: #2a6fb0;
+      margin-left: 3px;
+      font-family: 'Playfair Display', serif;
+      vertical-align: -2px;
+    }
+
+    .ticket-signature {
+      text-align: right;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 8.5px;
+      color: #1e293b;
+      margin-top: 3px;
+      padding-right: 8px;
+      font-weight: 900;
+    }
+
+    .ticket-source {
+      display: block;
+      margin-top: 1px;
+      padding-right: 8px;
+      color: #2a6fb0;
+      font-family: 'Special Elite', cursive;
+      font-size: 5.8px;
+      letter-spacing: 0.5px;
+      text-align: right;
+      text-decoration: none;
+    }
+
+    .ticket-source:hover { text-decoration: underline; }
+
+    .ticket-consultation {
+      margin: 5px 2px 0;
+      padding: 3px 5px;
+      border: 1px solid rgba(42, 111, 176, 0.38);
+      border-radius: 4px;
+      background: rgba(116, 172, 223, 0.08);
+      color: #334155;
+      font-family: 'Special Elite', cursive;
+      font-size: 6.5px;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    .ticket-consultation strong {
+      display: block;
+      margin-bottom: 1px;
+      color: #1a4f80;
+      font-size: 5.2px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .ticket-footer {
+      border-top: 1px dashed #74acdf;
+      margin-top: 5px;
+      padding-top: 3px;
+      text-align: center;
+      font-family: 'Special Elite', cursive;
+      font-size: 5.8px;
+      color: #334155;
+      letter-spacing: 1.1px;
+      font-weight: bold;
+    }
+
+    .ticket-footer span {
+      color: #0f172a;
+      font-family: 'Courier Prime', monospace;
+      font-size: 6.5px;
+    }
+
+    /* ACTION BAR ON THE DISPENSED TICKET */
+    .ticket-controls {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 5px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(42, 111, 176, 0.2);
+    }
+
+    .ticket-btn {
+      background: #0f172a;
+      color: #ffe680;
+      border: 1px solid #f5b000;
+      border-radius: 4px;
+      padding: 2.5px 7px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .ticket-btn:hover {
+      background: #1e293b;
+      color: #ffffff;
+      transform: scale(1.04);
+    }
+
+    /* ZOOMED VIEW (WHEN USER CLICKS TICKET TO READ UP-CLOSE) */
+    .vintage-ticket.is-zoomed {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) scale(1.05) !important;
+      opacity: 1 !important;
+      animation: none !important;
+      width: 90% !important;
+      max-width: 420px !important;
+      z-index: 100 !important;
+      padding: 18px 22px 16px !important;
+      box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.98),
+        0 0 45px rgba(116, 172, 223, 0.5) !important;
+      cursor: default;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-main-title {
+      font-size: 14px !important;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-sub-title {
+      font-size: 9px !important;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-quote {
+      font-size: 17px !important;
+      line-height: 1.45 !important;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-signature {
+      font-size: 12px !important;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-consultation {
+      font-size: 8.5px !important;
+      padding: 7px 9px !important;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-footer {
+      font-size: 7.5px !important;
+    }
+
+    .vintage-ticket.is-zoomed .rubber-stamp {
+      width: 76px !important;
+      height: 76px !important;
+      font-size: 6.5px !important;
+    }
+
+    .ticket-close-badge {
+      position: absolute;
+      top: 7px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid #2a6fb0;
+      background: #eef6fc;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #111827;
+      cursor: pointer;
+      font-weight: 900;
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+
+    .vintage-ticket.is-zoomed .ticket-close-badge {
+      display: flex;
+    }
+
+    .ticket-close-badge:hover {
+      background: #111827;
+      color: #ffe680;
+      border-color: #f5b000;
+      transform: scale(1.1);
+    }
+
+    /* 8-BIT MUSIC BADGE */
+    .music-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 3px;
+      padding: 1.5px 6px;
+      background: #0f172a;
+      border: 1px solid #f5b000;
+      border-radius: 12px;
+      color: #ffe680;
+      font-family: 'Courier Prime', monospace;
+      font-size: 6.2px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* =========================================================================
+       1951 ELECTORAL BALLOT REDESIGN
+    ========================================================================= */
+    .vintage-ticket {
+      background-color: #e8e2d2;
+      background-image:
+        linear-gradient(rgba(244, 240, 226, 0.93), rgba(224, 217, 198, 0.94)),
+        url('boleta-1951-reference.jpg');
+      background-position: center;
+      background-size: cover;
+      border: 1.5px solid #24231f;
+      outline: none;
+      border-radius: 1px;
+      padding: 10px 12px 9px;
+      color: #211f1a;
+      box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.9),
+        inset 0 0 18px rgba(73, 62, 42, 0.16);
+      filter: sepia(0.14) contrast(1.03);
+    }
+
+    .vintage-ticket::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(39, 36, 29, 0.38);
+      pointer-events: none;
+    }
+
+    .ballot-header {
+      display: grid;
+      grid-template-columns: 50px 1fr 50px;
+      align-items: start;
+      gap: 8px;
+      min-height: 61px;
+      margin: 0 0 5px;
+      padding: 0 2px 5px;
+      border-bottom: 1.5px solid #292720;
+      text-align: center;
+    }
+
+    .ballot-header::after { display: none; }
+
+    .ballot-portrait {
+      position: relative;
+      width: 50px;
+      height: 54px;
+      margin: 0;
+      border: 1px solid #26241f;
+      background-color: #d8d2c1;
+      background-image: url('boleta-1951-reference.jpg');
+      background-repeat: no-repeat;
+      filter: grayscale(1) contrast(1.35);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .ballot-portrait-peron {
+      background-size: 314px 461px;
+      background-position: -18px -5px;
+    }
+
+    .ballot-portrait-evita {
+      background-size: 314px 461px;
+      background-position: -250px -9px;
+    }
+
+    .ballot-portrait figcaption {
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      bottom: -10px;
+      color: #24221d;
+      font-family: 'Courier Prime', monospace;
+      font-size: 5.7px;
+      font-weight: 700;
+      letter-spacing: 0.35px;
+      white-space: nowrap;
+    }
+
+    .ballot-party {
+      display: grid;
+      grid-template-columns: 1fr 35px 1fr;
+      align-items: center;
+      justify-items: center;
+      gap: 4px;
+      padding-top: 3px;
+    }
+
+    .ballot-party-name {
+      font-family: 'Special Elite', 'Courier Prime', monospace;
+      font-size: clamp(7px, 1.65vw, 9px);
+      font-weight: 900;
+      letter-spacing: 0.35px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .ballot-emblem {
+      width: 34px;
+      height: 43px;
+      object-fit: contain;
+      filter: grayscale(1) contrast(1.45) brightness(0.82);
+      mix-blend-mode: multiply;
+    }
+
+    .ballot-election-line {
+      margin: 5px 2px 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px dotted #3e3a31;
+      font-family: 'Courier Prime', monospace;
+      font-size: clamp(6.7px, 1.55vw, 8px);
+      font-weight: 700;
+      letter-spacing: 0.75px;
+      text-align: center;
+    }
+
+    .ticket-body {
+      margin: 5px 0 6px;
+      color: #211f1a;
+    }
+
+    .ticket-consultation {
+      margin: 0 3px 6px;
+      padding: 4px 6px 5px;
+      border: 0;
+      border-bottom: 1px dotted #565044;
+      border-radius: 0;
+      background: transparent;
+      color: #3b3831;
+      font-family: 'Courier Prime', monospace;
+      font-size: clamp(6.5px, 1.55vw, 8px);
+      line-height: 1.3;
+    }
+
+    .ticket-consultation strong {
+      margin-bottom: 2px;
+      color: #211f1a;
+      font-size: 6px;
+      letter-spacing: 1px;
+    }
+
+    .ballot-message-label {
+      margin: 2px 0 3px;
+      font-family: 'Courier Prime', monospace;
+      font-size: clamp(10px, 2.25vw, 12px);
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-align: center;
+    }
+
+    .ticket-quote {
+      padding: 2px 8px;
+      color: #15140f;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(13px, 3vw, 15px);
+      font-style: normal;
+      font-weight: 800;
+      line-height: 1.34;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .ticket-quote::before,
+    .ticket-quote::after {
+      color: #211f1a;
+      font-size: 17px;
+    }
+
+    .ticket-signature {
+      margin-top: 4px;
+      padding-right: 5px;
+      color: #211f1a;
+      font-family: 'Special Elite', cursive;
+      font-size: 8px;
+      font-style: normal;
+    }
+
+    .ticket-source {
+      margin-top: 2px;
+      padding-right: 5px;
+      color: #4a463d;
+      font-family: 'Courier Prime', monospace;
+      font-size: 5.8px;
+      letter-spacing: 0.2px;
+    }
+
+    .ticket-footer {
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1.5px solid #292720;
+      color: #2f2c25;
+      font-family: 'Courier Prime', monospace;
+      font-size: 6px;
+      letter-spacing: 0.65px;
+    }
+
+    .ticket-footer span {
+      color: #1d1b17;
+      font-size: 7px;
+    }
+
+    .music-badge {
+      margin-top: 3px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #211f1a;
+      box-shadow: none;
+      font-family: 'Courier Prime', monospace;
+      font-size: 6.2px;
+      letter-spacing: 1px;
+    }
+
+    .ticket-controls {
+      gap: 5px;
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px dotted #575145;
+    }
+
+    .ticket-btn {
+      border: 1px solid #27251f;
+      border-radius: 0;
+      background: transparent;
+      color: #27251f;
+      box-shadow: none;
+      font-family: 'Courier Prime', monospace;
+      font-size: 6.5px;
+      letter-spacing: 0.45px;
+    }
+
+    .ticket-btn:hover {
+      background: #27251f;
+      color: #eee8d8;
+    }
+
+    .ticket-close-badge {
+      border: 1px solid #292720;
+      border-radius: 0;
+      background: #e8e2d2;
+      color: #211f1a;
+    }
+
+    .vintage-ticket.is-zoomed {
+      padding: 20px 24px 18px !important;
+      background-color: #e8e2d2 !important;
+      box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.98),
+        0 0 0 1px rgba(235, 226, 198, 0.3) !important;
+    }
+
+    .vintage-ticket.is-zoomed .ballot-header {
+      grid-template-columns: 66px 1fr 66px;
+      min-height: 82px;
+      gap: 12px;
+    }
+
+    .vintage-ticket.is-zoomed .ballot-portrait {
+      width: 66px;
+      height: 70px;
+      background-size: 414px 608px;
+    }
+
+    .vintage-ticket.is-zoomed .ballot-portrait-peron { background-position: -24px -7px; }
+    .vintage-ticket.is-zoomed .ballot-portrait-evita { background-position: -330px -12px; }
+    .vintage-ticket.is-zoomed .ballot-party { grid-template-columns: 1fr 48px 1fr; }
+    .vintage-ticket.is-zoomed .ballot-emblem { width: 46px; height: 58px; }
+    .vintage-ticket.is-zoomed .ballot-party-name { font-size: 11px; }
+    .vintage-ticket.is-zoomed .ballot-election-line { font-size: 9px; margin-top: 8px; }
+    .vintage-ticket.is-zoomed .ballot-message-label { font-size: 14px; }
+    .vintage-ticket.is-zoomed .ticket-quote { font-size: 20px !important; line-height: 1.38 !important; }
+    .vintage-ticket.is-zoomed .ticket-signature { font-size: 10px !important; }
+    .vintage-ticket.is-zoomed .ticket-source { font-size: 7px; }
+    .vintage-ticket.is-zoomed .ticket-consultation { font-size: 9px !important; padding: 6px 8px !important; }
+    .vintage-ticket.is-zoomed .ticket-footer { font-size: 7px !important; }
+
+    /* BOTTOM NOTIFICATION / INSTRUCTION TOAST */
+    .instruction-hud {
+      position: absolute;
+      bottom: 1.5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      text-align: center;
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(7.5px, 2.2vw, 10px);
+      color: #ffd978;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px #000, 0 0 8px rgba(212, 167, 44, 0.6);
+      z-index: 50;
+      pointer-events: none;
+      background: rgba(10, 4, 1, 0.82);
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid rgba(212, 167, 44, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+      transition: all 0.3s;
+    }
+
+    .instruction-hud.is-muted {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- DARKENED BACKDROP OVERLAY (ACTIVATED WHEN USER ZOOMS THE TICKET) -->
+  <div class="ticket-backdrop" id="ticketBackdrop" title="Tocar para cerrar vista previa"></div>
+
+  <div class="machine-wrapper" id="machineWrapper">
+    <!-- LAYER 1: PERÓN NEUTRAL (REST STATE) -->
+    <img src="peron-neutral.png" alt="" aria-hidden="true" class="peron-layer peron-neutral" id="peronNeutral" />
+
+    <!-- LAYER 2: PERÓN HANDS UP (TICKET DELIVERY & CELEBRATION REACTION) -->
+    <img src="peron-manos-arriba.png" alt="" aria-hidden="true" class="peron-layer peron-hands-up" id="peronHandsUp" />
+
+    <!-- LAYER 3: CABIN INTERIOR STAGE (LIGHTS, DUST, STEAM & EYES - LOCATED INSIDE BOOTH BEHIND SMOKE!) -->
+    <div class="cabin-interior-stage" id="cabinInteriorStage">
+      <!-- WARM VINTAGE SCONCES (ALIGNING ON SCONCES: LEFT X=20.8%, RIGHT X=79.2%, Y=40.0%) -->
+      <div class="lamp-glow left"></div>
+      <div class="lamp-glow right"></div>
+
+      <!-- FLOATING DUST MOTES IN GLASS -->
+      <canvas class="dust-canvas" id="dustCanvas"></canvas>
+
+      <!-- STEAM SPOUT FROM THE PAVA (MATE KETTLE) -->
+      <canvas class="steam-canvas" id="steamCanvas"></canvas>
+
+      <!-- INTERACTIVE EYE GAZE TRACKING (PRECISELY CENTERED ON REAL PUPILS: LEFT X=47.36%, RIGHT X=53.39%, Y=38.10%) -->
+      <div class="eye-track left" id="eyeTrackL">
+        <div class="eyelid-overlay" id="eyelidL"></div>
+        <div class="pupil-point" id="pupilL"></div>
+      </div>
+      <div class="eye-track right" id="eyeTrackR">
+        <div class="eyelid-overlay" id="eyelidR"></div>
+        <div class="pupil-point" id="pupilR"></div>
+      </div>
+    </div>
+
+    <!-- LAYER 4: CABIN SMOKE CHAMBER (TRANSLUCENT PROCEDURAL FOG IN FRONT OF LIGHTS & EYES; BEHIND GLASS & CABIN FRAME) -->
+    <div class="smoke-chamber" id="smokeChamber">
+      <div class="smoke-billows" id="smokeBillows"></div>
+      <canvas class="smoke-canvas" id="smokeCanvas"></canvas>
+      <div class="smoke-veil" id="smokeVeil"></div>
+    </div>
+
+    <!-- LAYER 5: GLASS TEXTURE ON CENTRAL APERTURE -->
+    <img src="vidrio.png" alt="" aria-hidden="true" class="glass-layer" id="glassLayer" />
+
+    <!-- LAYER 6: FRONT CABIN WITH CENTRAL TRANSPARENCY & CHROME FRAME -->
+    <img src="cabina.png" alt="" aria-hidden="true" class="cabin-layer" id="cabinLayer" />
+
+    <!-- LAYER 7: FRONT INTERACTIVE CONTROLS (OUTSIDE BOOTH) -->
+    <div class="interactive-stage" id="interactiveStage">
+      <!-- FREE-TEXT CONSULTATION PANEL BEFORE STARTING THE RITUAL -->
+      <div class="consultation-panel" id="consultationPanel">
+        <label class="consultation-label" for="consultationInput">Consultá al General</label>
+        <textarea class="consultation-input" id="consultationInput" maxlength="220" rows="2"
+          placeholder="Escribí una pregunta breve, en una o dos frases…"></textarea>
+        <div class="consultation-meta">
+          <span>No te olvides de apretar el botón, compañero</span>
+          <span id="consultationCounter">0 / 220</span>
+        </div>
+      </div>
+
+      <!-- BRONZE BUTTON OVERLAY ("INSERTAR AGUINALDO") -->
+      <button class="btn-target-area" id="triggerBtn" aria-label="Apretar el botón y consultar" disabled>
+        <div class="btn-halo"></div>
+      </button>
+
+      <!-- 3D COIN DROP ANIMATION ELEMENT -->
+      <div class="falling-coin" id="fallingCoin">🪙</div>
+
+      <!-- PHYSICAL TICKET DISPENSER (EMERGES DOWNWARDS FROM RANURA Y=74.8% AND STAYS DOWN) -->
+      <div class="slot-dispenser" id="slotDispenser">
+        <div class="slot-chute" id="slotChute">
+          <div class="vintage-ticket" id="vintageTicket" title="Tocar para ampliar lectura">
+            <div class="ticket-close-badge" id="ticketCloseBadge" title="Cerrar vista previa">✕</div>
+
+            <header class="ticket-header ballot-header">
+              <figure class="ballot-portrait ballot-portrait-peron" role="img" aria-label="Juan Domingo Perón">
+                <figcaption>J. D. PERÓN</figcaption>
+              </figure>
+
+              <div class="ballot-party">
+                <div class="ballot-party-name">PARTIDO</div>
+                <img class="ballot-emblem" src="escudo-justicialista.svg" alt="Escudo del Partido Justicialista" />
+                <div class="ballot-party-name">JUSTICIALISTA</div>
+              </div>
+
+              <figure class="ballot-portrait ballot-portrait-evita" role="img" aria-label="Eva Perón">
+                <figcaption>EVA PERÓN</figcaption>
+              </figure>
+            </header>
+
+            <div class="ballot-election-line">ELECCIÓN DOCTRINARIA · BOLETA DE LA CONDUCCIÓN</div>
+
+            <div class="ticket-body">
+              <div class="ticket-consultation">
+                <strong>Consulta formulada</strong>
+                <span id="ticketQuestion"></span>
+              </div>
+              <div class="ballot-message-label">MENSAJE</div>
+              <p class="ticket-quote" id="ticketQuote"></p>
+              <div class="ticket-signature">— Juan Domingo Perón</div>
+              <a class="ticket-source" id="ticketSource"
+                href="https://digitales.bcn.gob.ar/files/textos/Peron.-Conduccion-politica.pdf" target="_blank"
+                rel="noopener noreferrer"></a>
+            </div>
+
+            <div class="ticket-footer">
+              LISTA N° <span id="ticketSerial">000000</span> · DISTRITO REPÚBLICA ARGENTINA
+              <br>
+              <div class="music-badge">♪ MARCHA PERONISTA ♪</div>
+            </div>
+
+            <div class="ticket-controls">
+              <button class="ticket-btn" id="ticketZoomBtn">🔍 AMPLIAR</button>
+              <button class="ticket-btn" id="ticketNewBtn">↺ NUEVA CONSULTA</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM INSTRUCTION TOAST -->
+      <div class="instruction-hud" id="instructionHud" aria-live="polite">— ESCRIBÍ TU CONSULTA Y RECIBÍ EL AGUINALDO DE LA SUERTE —</div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       PERÓN DOCTRINE DATABASE
+    ========================================================================= */
+    const CITAS_VERIFICADAS = [
+      {
+        id: 'convencer-convencido',
+        text: 'Para convencer lo primero que hay que hacer es estar convencido.',
+        source: 'Conducción política (1951), p. 259',
+        topics: ['conduccion', 'verdad', 'relaciones']
+      },
+      {
+        id: 'elocuencia-verdad',
+        text: 'La elocuencia se forma por la verdad.',
+        source: 'Conducción política (1951), p. 260',
+        topics: ['verdad', 'conduccion', 'relaciones']
+      },
+      {
+        id: 'tarea-persuadir',
+        text: 'Mi tarea era persuadir.',
+        source: 'Conducción política (1951), p. 258',
+        topics: ['conduccion', 'relaciones']
+      },
+      {
+        id: 'organizacion-simplicidad',
+        text: 'La primera regla de la organización es la simplicidad.',
+        source: 'Conducción política (1951), p. 85',
+        topics: ['organizacion', 'trabajo']
+      },
+      {
+        id: 'organizar-finalidad',
+        text: 'Hay que organizar una cosa para su finalidad.',
+        source: 'Conducción política (1951), p. 85',
+        topics: ['organizacion', 'accion', 'trabajo']
+      },
+      {
+        id: 'problemas-y-hombres',
+        text: 'Todos los problemas tienen solución pero no todos los hombres tienen solución.',
+        source: 'Conducción política (1951), p. 86',
+        topics: ['relaciones', 'trabajo', 'humor']
+      },
+      {
+        id: 'construir-desde-abajo',
+        text: 'En esto, como en todo lo demás, se comienza a construir desde abajo y nunca desde arriba.',
+        source: 'Conducción política (1951), pp. 86-87',
+        topics: ['accion', 'organizacion', 'trabajo']
+      },
+      {
+        id: 'organizacion-vence-numero',
+        text: 'Lo único que vence al número es la organización.',
+        source: 'Conducción política (1951), p. 288',
+        topics: ['organizacion', 'comunidad']
+      },
+      {
+        id: 'organizacion-vence-tiempo',
+        text: 'La organización también vence al tiempo.',
+        source: 'Conducción política (1951), p. 288',
+        topics: ['organizacion', 'futuro']
+      },
+      {
+        id: 'organizaciones-sobreviven',
+        text: 'Las organizaciones sobreviven a los hombres.',
+        source: 'Conducción política (1951), p. 288',
+        topics: ['organizacion', 'futuro', 'comunidad']
+      },
+      {
+        id: 'realidad-fuente',
+        text: 'Es necesario tener la realidad, y la realidad se bebe en su propia fuente.',
+        source: 'Conducción política (1951), p. 268',
+        topics: ['verdad', 'accion', 'conduccion']
+      },
+      {
+        id: 'eleccion-servir-pais',
+        text: 'Ganar la elección es para nosotros un medio para servir al país.',
+        source: 'Conducción política (1951), p. 109',
+        topics: ['comunidad', 'conduccion', 'accion']
+      },
+      {
+        id: 'genio-trabajo',
+        text: 'El genio es trabajo.',
+        source: 'Conducción política (1951), p. 158',
+        topics: ['trabajo', 'accion']
+      },
+      {
+        id: 'cumplir-plan',
+        text: 'No; malo o bueno, el plan hay que cumplirlo.',
+        source: 'Conducción política (1951), p. 234',
+        topics: ['organizacion', 'futuro', 'accion']
+      },
+      {
+        id: 'donde-y-cuando',
+        text: 'Dónde y cuándo, ése es todo el secreto, en mi concepto.',
+        source: 'Conducción política (1951), p. 229',
+        topics: ['accion', 'futuro', 'conduccion']
+      },
+      {
+        id: 'objetivo-principal',
+        text: 'Lo importante es no equivocarse en cuál es el objetivo principal y cuál el secundario.',
+        source: 'Conducción política (1951), p. 229',
+        topics: ['accion', 'organizacion', 'trabajo']
+      },
+      {
+        id: 'colaboracion-verdadera',
+        text: 'La verdadera colaboración no es alabar siempre sino señalar los errores, hablando un lenguaje claro de realidad, de verdad y de amistad.',
+        source: 'Conducción política (1951), p. 144',
+        topics: ['relaciones', 'verdad', 'trabajo']
+      },
+      {
+        id: 'paciencia-tolerancia',
+        text: 'Con ductilidad, con paciencia y con tolerancia.',
+        source: 'Conducción política (1951), p. 144',
+        topics: ['relaciones', 'futuro']
+      },
+      {
+        id: 'solidaridad-viene-sola',
+        text: 'Cuando todos los hombres piensan de una misma manera y sienten de un mismo modo, la solidaridad viene sola.',
+        source: 'Conducción política (1951), p. 246',
+        topics: ['relaciones', 'comunidad']
+      },
+      {
+        id: 'poquito-mas',
+        text: 'Para vencer, se necesita tener un poquito más que el otro: nada más que un poquito...',
+        source: 'Conducción política (1951), p. 202',
+        topics: ['accion', 'trabajo', 'humor']
+      },
+      {
+        id: 'hombre-complicado',
+        text: 'El hombre es un bicho muy complicado en la conducción.',
+        source: 'Conducción política (1951), p. 205',
+        topics: ['relaciones', 'conduccion', 'humor']
+      },
+      {
+        id: 'disciplinados-menos-el',
+        text: 'El hombre quiere que todos sean disciplinados... menos él.',
+        source: 'Conducción política (1951), p. 206',
+        topics: ['relaciones', 'organizacion', 'humor']
+      },
+      {
+        id: 'unidad-en-marcha',
+        text: 'La unidad de acción es la unidad de concepción en marcha, en ejecución.',
+        source: 'Conducción política (1951), pp. 204-205',
+        topics: ['comunidad', 'organizacion', 'accion']
+      }
+    ];
+
+    const TOPIC_KEYWORDS = {
+      accion: ['hacer', 'hago', 'haré', 'hacerlo', 'empez', 'arranc', 'decid', 'eleg', 'cambi', 'puedo', 'debo', 'arriesg'],
+      trabajo: ['trabaj', 'emple', 'jefe', 'plata', 'dinero', 'sueldo', 'negocio', 'econom', 'profes', 'estudi', 'proyecto'],
+      relaciones: ['amor', 'pareja', 'novi', 'famil', 'amig', 'compañ', 'relacion', 'separ', 'pelea', 'conflict', 'perdon', 'confianza'],
+      verdad: ['verdad', 'mentir', 'mentira', 'realidad', 'sincer', 'duda', 'segur', 'confus', 'engañ', 'creer', 'creo', 'confi'],
+      organizacion: ['plan', 'orden', 'organiz', 'equipo', 'objetivo', 'meta', 'estructura', 'proyecto'],
+      futuro: ['futuro', 'tiempo', 'esper', 'mañana', 'después', 'destino', 'lograr', 'llegar'],
+      conduccion: ['lider', 'conduc', 'mandar', 'poder', 'jefe', 'dirig', 'convencer', 'hablar', 'comunicar'],
+      comunidad: ['pueblo', 'politic', 'país', 'patria', 'justicia', 'social', 'unidad', 'unir', 'solidar', 'votar', 'elección'],
+      humor: ['problema', 'complic', 'imposible', 'fracaso', 'mal', 'error']
+    };
+
+    const QUOTE_SOURCE_URL = 'https://digitales.bcn.gob.ar/files/textos/Peron.-Conduccion-politica.pdf';
+    const SEEN_QUOTES_KEY = 'peron-matic-seen-quotes-v1';
+
+    /* =========================================================================
+       SYNTHETIC RETRO 8-BIT WEB AUDIO ENGINE
+    ========================================================================= */
+    class RetroAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.activeNodes = [];
+        this.musicTimeoutIds = [];
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            this.ctx = new AudioContextClass();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      stopAllMusic() {
+        this.musicTimeoutIds.forEach(id => clearTimeout(id));
+        this.musicTimeoutIds = [];
+
+        this.activeNodes.forEach(node => {
+          try {
+            if (node.stop) node.stop();
+            node.disconnect();
+          } catch (e) { }
+        });
+        this.activeNodes = [];
+      }
+
+      playCoinDrop() {
+        if (!this.ctx) return;
+        this.stopAllMusic();
+        const now = this.ctx.currentTime;
+
+        // Metallic Ring 1
+        const osc1 = this.ctx.createOscillator();
+        const gain1 = this.ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(3200, now);
+        osc1.frequency.exponentialRampToValueAtTime(2200, now + 0.15);
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(this.ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.35);
+
+        // Chute Clink 2
+        const osc2 = this.ctx.createOscillator();
+        const gain2 = this.ctx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(1400, now + 0.12);
+        osc2.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+        gain2.gain.setValueAtTime(0.25, now + 0.12);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc2.connect(gain2);
+        gain2.connect(this.ctx.destination);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.45);
+      }
+
+      playGearHum(duration = 2.4) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(65, now);
+        osc.frequency.linearRampToValueAtTime(78, now + duration * 0.5);
+        osc.frequency.linearRampToValueAtTime(60, now + duration);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(280, now);
+
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.2);
+        gain.gain.linearRampToValueAtTime(0.15, now + duration - 0.3);
+        gain.gain.linearRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      playPrinterRatchet() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        for (let i = 0; i < 10; i++) {
+          const time = now + i * 0.08;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440 + (i % 3) * 90, time);
+          gain.gain.setValueAtTime(0.12, time);
+          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.045);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(time);
+          osc.stop(time + 0.045);
+        }
+      }
+
+      /* =========================================================================
+         8-BIT CHIPTUNE: "MARCHA PERONISTA"
+      ========================================================================= */
+      playMarchaPeronista8Bit() {
+        if (!this.ctx) return;
+        this.stopAllMusic();
+
+        const masterGain = this.ctx.createGain();
+        masterGain.gain.setValueAtTime(0.24, this.ctx.currentTime);
+        masterGain.connect(this.ctx.destination);
+        this.activeNodes.push(masterGain);
+
+        // A minor transcription of the recognizable vocal melody.
+        const N = {
+          A3: 220.00, B3: 246.94, C4: 261.63, D4: 293.66, E4: 329.63,
+          A4: 440.00, B4: 493.88, C5: 523.25, D5: 587.33,
+          E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00,
+          REST: 0
+        };
+
+        const eighth = (60 / 132) / 2;
+        const e = eighth;
+        const q = eighth * 2;
+        const h = eighth * 4;
+
+        const leadScore = [
+          // Start with the unmistakable chorus so it is recognized immediately.
+          // "Perón, Perón, qué grande sos / Mi General, cuánto valés"
+          [N.E5, e], [N.E5, e], [N.E5, e], [N.E5, e],
+          [N.D5, e], [N.C5, e], [N.B4, e], [N.C5, q],
+          [N.E5, e], [N.E5, e], [N.E5, e], [N.E5, e],
+          [N.D5, e], [N.C5, e], [N.B4, e], [N.C5, q],
+          // "Perón, Perón, gran conductor / Sos el primer trabajador"
+          [N.A5, e], [N.A5, e], [N.A5, q],
+          [N.F5, e], [N.F5, e], [N.E5, e], [N.D5, e], [N.E5, q],
+          [N.C5, e], [N.C5, e], [N.D5, e], [N.E5, q],
+          [N.D5, e], [N.C5, e], [N.B4, e], [N.A4, h],
+          [N.REST, h + h],
+
+          // "Los muchachos peronistas"
+          [N.E5, e], [N.C5, e], [N.A4, e], [N.E5, q],
+          [N.C5, e], [N.A4, e], [N.E5, e], [N.C5, q],
+
+          // "todos unidos triunfaremos"
+          [N.E5, e], [N.C5, e], [N.A4, e], [N.E5, e],
+          [N.E5, e], [N.D5, e], [N.C5, e], [N.D5, e], [N.B4, q],
+
+          // "y como siempre daremos"
+          [N.D5, e], [N.B4, e], [N.A4, e], [N.D5, q],
+          [N.B4, e], [N.A4, e], [N.D5, e], [N.B4, q],
+
+          // "un grito de corazón"
+          [N.F5, e], [N.F5, e], [N.F5, e], [N.F5, e],
+          [N.E5, e], [N.D5, e], [N.E5, q],
+          [N.F5, e], [N.E5, e], [N.D5, e], [N.E5, e],
+          [N.F5, e], [N.E5, e], [N.D5, e], [N.E5, q],
+
+          // Verse resolution
+          [N.E5, e], [N.C5, e], [N.A4, e], [N.E5, q],
+          [N.C5, e], [N.A4, e], [N.E5, e], [N.C5, q],
+          [N.E5, e], [N.E5, e], [N.E5, e], [N.E5, e], [N.G5, e],
+          [N.F5, e], [N.E5, e], [N.F5, q],
+          [N.D5, e], [N.E5, e], [N.F5, e], [N.F5, e],
+          [N.E5, e], [N.D5, e], [N.E5, q], [N.E5, q],
+          [N.C5, e], [N.D5, e], [N.E5, e], [N.D5, e],
+          [N.C5, e], [N.B4, e], [N.A4, h],
+
+          [N.REST, e],
+
+          // "Perón, Perón, qué grande sos / Mi General, cuánto valés"
+          [N.E5, e], [N.E5, e], [N.E5, e], [N.E5, e],
+          [N.D5, e], [N.C5, e], [N.B4, e], [N.C5, q],
+          [N.E5, e], [N.E5, e], [N.E5, e], [N.E5, e],
+          [N.D5, e], [N.C5, e], [N.B4, e], [N.C5, q],
+
+          // "Perón, Perón, gran conductor / Sos el primer trabajador"
+          [N.A5, e], [N.A5, e], [N.A5, q],
+          [N.F5, e], [N.F5, e], [N.E5, e], [N.D5, e], [N.E5, q],
+          [N.C5, e], [N.C5, e], [N.D5, e], [N.E5, q],
+          [N.D5, e], [N.C5, e], [N.B4, e], [N.A4, h]
+        ];
+
+        let currentStartTime = this.ctx.currentTime + 0.05;
+
+        const playLeadNote = (freq, startTime, dur) => {
+          if (!freq || !isFinite(freq) || freq <= 0) return;
+          try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, startTime);
+
+            const attack = Math.min(0.015, dur * 0.15);
+            gain.gain.setValueAtTime(0.001, startTime);
+            gain.gain.linearRampToValueAtTime(0.24, startTime + attack);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur * 0.95);
+
+            osc.connect(gain);
+            gain.connect(masterGain);
+
+            osc.start(startTime);
+            osc.stop(startTime + dur);
+            this.activeNodes.push(osc, gain);
+          } catch (err) { }
+        };
+
+        const playBassNote = (freq, startTime, dur) => {
+          if (!freq || !isFinite(freq) || freq <= 0) return;
+          try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, startTime);
+
+            gain.gain.setValueAtTime(0.28, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur * 0.85);
+
+            osc.connect(gain);
+            gain.connect(masterGain);
+
+            osc.start(startTime);
+            osc.stop(startTime + dur);
+            this.activeNodes.push(osc, gain);
+          } catch (err) { }
+        };
+
+        let pulseIndex = 0;
+        leadScore.forEach(([freq, dur]) => {
+          playLeadNote(freq, currentStartTime, dur);
+          if (freq && freq > 0 && pulseIndex % 2 === 0) {
+            const bassFreq = pulseIndex % 4 === 0 ? N.A3 : N.E4;
+            playBassNote(bassFreq, currentStartTime, Math.max(q * 0.82, dur));
+          }
+          currentStartTime += dur;
+          pulseIndex += 1;
+        });
+
+        const marchStopTimeout = setTimeout(() => this.stopAllMusic(), 9500);
+        this.musicTimeoutIds.push(marchStopTimeout);
+      }
+
+      /* Exact 16.51-second arrangement transcribed from marcha-peronista.mid.
+         MIDI format 0, 96 PPQN, default tempo 120 BPM. */
+      playMarchaPeronistaMidi8Bit() {
+        if (!this.ctx) return;
+        this.stopAllMusic();
+
+        const ticksPerSecond = 192;
+        const totalTicks = 3170;
+        const midiNotes = [
+          [0,69,76,23],[0,91,88,36],[2,62,72,20],[96,60,84,36],[160,56,81,32],
+          [192,71,76,23],[192,91,88,35],[194,85,72,24],[290,51,84,31],[355,44,81,30],
+          [384,165,88,34],[386,89,72,24],[386,54,76,18],[576,78,84,36],[578,49,76,16],
+          [580,34,72,13],[770,87,72,24],[770,49,76,16],[770,91,88,34],[866,58,84,35],
+          [928,52,81,34],[962,65,72,21],[962,69,76,23],[962,56,88,35],[1024,40,88,34],
+          [1058,58,86,36],[1123,35,84,36],[1152,66,71,10],[1154,62,76,21],[1154,82,86,35],
+          [1163,61,83,9],[1346,67,83,37],[1348,47,76,17],[1355,51,68,10],[1538,71,76,24],
+          [1538,78,86,35],[1547,64,71,12],[1636,54,83,33],[1699,33,80,37],[1730,82,86,37],
+          [1732,58,76,20],[1736,25,83,10],[1739,85,71,13],[1826,67,83,35],[1891,46,80,33],
+          [1924,54,76,19],[1924,58,86,33],[1931,57,71,10],[2116,58,76,20],[2116,85,83,39],
+          [2123,47,71,10],[2308,54,77,21],[2308,89,89,33],[2310,72,74,20],[2315,85,69,10],
+          [2404,56,89,34],[2467,29,89,34],[2496,72,89,20],[2500,67,77,23],[2502,65,74,19],
+          [2596,65,88,36],[2661,35,86,34],[2692,74,76,23],[2692,65,88,35],[2694,54,72,21],
+          [2695,44,69,9],[2757,31,89,34],[2788,65,88,34],[2853,35,86,32],[2884,74,76,22],
+          [2884,65,88,35],[2886,78,72,22],[2949,35,89,32],[2980,56,76,20],[2982,63,88,35],
+          [2987,11,71,13],[3009,18,71,12],[3045,35,86,34],[3047,9,71,9],[3072,80,69,9],
+          [3076,94,88,35],[3078,81,72,23],[3078,60,76,20]
+        ];
+
+        const startAt = this.ctx.currentTime + 0.06;
+        const masterGain = this.ctx.createGain();
+        const chipFilter = this.ctx.createBiquadFilter();
+
+        masterGain.gain.setValueAtTime(0.3, startAt);
+        masterGain.gain.setValueAtTime(0.3, startAt + totalTicks / ticksPerSecond - 0.2);
+        masterGain.gain.linearRampToValueAtTime(0.001, startAt + totalTicks / ticksPerSecond + 0.06);
+
+        chipFilter.type = 'lowpass';
+        chipFilter.frequency.setValueAtTime(5600, startAt);
+        chipFilter.Q.setValueAtTime(0.7, startAt);
+        chipFilter.connect(masterGain);
+        masterGain.connect(this.ctx.destination);
+        this.activeNodes.push(chipFilter, masterGain);
+
+        midiNotes.forEach(([startTick, durationTicks, midiPitch, velocity]) => {
+          const noteStart = startAt + startTick / ticksPerSecond;
+          const duration = Math.max(0.035, durationTicks / ticksPerSecond);
+          const noteEnd = noteStart + duration;
+          const frequency = 440 * Math.pow(2, (midiPitch - 69) / 12);
+          const isLeadVoice = midiPitch >= 80;
+          const level = (0.045 + Math.min(1, velocity / 40) * 0.13) * (isLeadVoice ? 1 : 0.76);
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = isLeadVoice ? 'square' : 'triangle';
+          osc.frequency.setValueAtTime(frequency, noteStart);
+
+          gain.gain.setValueAtTime(0.001, noteStart);
+          gain.gain.linearRampToValueAtTime(level, noteStart + Math.min(0.008, duration * 0.18));
+          gain.gain.setValueAtTime(level, Math.max(noteStart + 0.01, noteEnd - 0.025));
+          gain.gain.exponentialRampToValueAtTime(0.001, noteEnd);
+
+          osc.connect(gain);
+          gain.connect(chipFilter);
+          osc.start(noteStart);
+          osc.stop(noteEnd + 0.01);
+          this.activeNodes.push(osc, gain);
+        });
+
+        const finishAfterMs = Math.ceil((totalTicks / ticksPerSecond + 0.3) * 1000);
+        const musicEndTimeout = setTimeout(() => this.stopAllMusic(), finishAfterMs);
+        this.musicTimeoutIds.push(musicEndTimeout);
+      }
+    }
+
+    const audio = new RetroAudioEngine();
+
+    /* =========================================================================
+       DOM ELEMENTS & REFS
+    ========================================================================= */
+    const machineWrapper = document.getElementById('machineWrapper');
+    const triggerBtn = document.getElementById('triggerBtn');
+    const fallingCoin = document.getElementById('fallingCoin');
+    const pupilL = document.getElementById('pupilL');
+    const pupilR = document.getElementById('pupilR');
+    const eyelidL = document.getElementById('eyelidL');
+    const eyelidR = document.getElementById('eyelidR');
+    const consultationPanel = document.getElementById('consultationPanel');
+    const consultationInput = document.getElementById('consultationInput');
+    const consultationCounter = document.getElementById('consultationCounter');
+    const instructionHud = document.getElementById('instructionHud');
+    const peronNeutralImg = document.getElementById('peronNeutral');
+    const peronHandsUpImg = document.getElementById('peronHandsUp');
+
+    // Ticket & Slot Elements
+    const slotDispenser = document.getElementById('slotDispenser');
+    const slotChute = document.getElementById('slotChute');
+    const vintageTicket = document.getElementById('vintageTicket');
+    const ticketQuote = document.getElementById('ticketQuote');
+    const ticketSource = document.getElementById('ticketSource');
+    const ticketQuestion = document.getElementById('ticketQuestion');
+    const ticketSerial = document.getElementById('ticketSerial');
+    const ticketZoomBtn = document.getElementById('ticketZoomBtn');
+    const ticketNewBtn = document.getElementById('ticketNewBtn');
+    const ticketCloseBadge = document.getElementById('ticketCloseBadge');
+    const ticketBackdrop = document.getElementById('ticketBackdrop');
+
+    // Smoke Chamber Elements (TRANSLUCENT & IN FRONT OF LIGHTS/EYES)
+    const smokeChamber = document.getElementById('smokeChamber');
+    const smokeCanvas = document.getElementById('smokeCanvas');
+    const smokeCtx = smokeCanvas.getContext('2d');
+    const smokeVeil = document.getElementById('smokeVeil');
+
+    // Pre-decode both pose images
+    if (peronNeutralImg && peronNeutralImg.decode) peronNeutralImg.decode().catch(() => {});
+    if (peronHandsUpImg && peronHandsUpImg.decode) peronHandsUpImg.decode().catch(() => {});
+
+    let isConsulting = false;
+    let memorySeenQuoteIds = [];
+
+    /* =========================================================================
+       TRANSLUCENT VOLUMETRIC CABIN SMOKE ENGINE
+    ========================================================================= */
+    let smokeParticles = [];
+    let isGeneratingSmoke = false;
+    let smokeSpawnInterval = null;
+    let smokeStamp = null;
+
+    function initSmokeStamp() {
+      smokeStamp = document.createElement('canvas');
+      smokeStamp.width = 160;
+      smokeStamp.height = 160;
+      const sCtx = smokeStamp.getContext('2d');
+      const rad = sCtx.createRadialGradient(80, 80, 6, 80, 80, 75);
+      // Soft translucent gradient - never opaque white!
+      rad.addColorStop(0, 'rgba(255, 252, 245, 0.45)');
+      rad.addColorStop(0.35, 'rgba(245, 238, 222, 0.28)');
+      rad.addColorStop(0.7, 'rgba(230, 218, 195, 0.12)');
+      rad.addColorStop(1, 'rgba(215, 205, 185, 0)');
+      sCtx.fillStyle = rad;
+      sCtx.beginPath();
+      sCtx.arc(80, 80, 75, 0, Math.PI * 2);
+      sCtx.fill();
+    }
+    initSmokeStamp();
+
+    function resizeSmokeCanvas() {
+      if (!smokeCanvas) return;
+      smokeCanvas.width = smokeCanvas.offsetWidth || 340;
+      smokeCanvas.height = smokeCanvas.offsetHeight || 240;
+    }
+
+    function spawnSmokePuff() {
+      if (!smokeCanvas) return;
+      const w = smokeCanvas.width;
+      const h = smokeCanvas.height;
+      smokeParticles.push({
+        x: w * (0.15 + Math.random() * 0.7),
+        y: h * (0.8 + Math.random() * 0.2),
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: -Math.random() * 1.8 - 1.2,
+        size: Math.random() * 45 + 35,
+        growth: Math.random() * 1.3 + 0.8,
+        alpha: 0,
+        targetAlpha: Math.random() * 0.2 + 0.28,
+        fadeInRate: 0.08,
+        decayRate: 0.006,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.03
+      });
+    }
+
+    function updateSmokeLoop() {
+      smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+        const p = smokeParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.size += p.growth;
+        p.rot += p.vRot;
+
+        if (p.alpha < p.targetAlpha) {
+          p.alpha = Math.min(p.targetAlpha, p.alpha + p.fadeInRate);
+        } else {
+          p.alpha -= p.decayRate;
+        }
+
+        if (p.alpha <= 0 || p.y + p.size < 0) {
+          smokeParticles.splice(i, 1);
+          continue;
+        }
+
+        smokeCtx.save();
+        smokeCtx.globalAlpha = p.alpha;
+        smokeCtx.translate(p.x, p.y);
+        smokeCtx.rotate(p.rot);
+        const half = p.size / 2;
+        smokeCtx.drawImage(smokeStamp, -half, -half, p.size, p.size);
+        smokeCtx.restore();
+      }
+
+      requestAnimationFrame(updateSmokeLoop);
+    }
+    requestAnimationFrame(updateSmokeLoop);
+
+    function triggerCabinSmokeEffect(onPeakCover, onDissipated) {
+      smokeParticles = [];
+      isGeneratingSmoke = true;
+      resizeSmokeCanvas();
+      smokeChamber.classList.add('is-smoking');
+
+      if (smokeSpawnInterval) clearInterval(smokeSpawnInterval);
+      smokeSpawnInterval = setInterval(() => {
+        if (isGeneratingSmoke) {
+          for (let k = 0; k < 4; k++) spawnSmokePuff();
+        }
+      }, 40);
+
+      // Translucent atmospheric smoke veil (max 0.65 opacity)
+      smokeVeil.style.opacity = '0.65';
+
+      // Peak translucent cover reached at ~1.5s -> switch Perón pose to hands up!
+      setTimeout(() => {
+        if (onPeakCover) onPeakCover();
+
+        isGeneratingSmoke = false;
+        clearInterval(smokeSpawnInterval);
+
+        // Begin dissipation
+        smokeVeil.style.opacity = '0';
+        smokeChamber.classList.remove('is-smoking');
+        smokeParticles.forEach(p => {
+          p.decayRate = 0.024;
+          p.vy *= 1.35;
+        });
+
+        // Fully dissipated
+        setTimeout(() => {
+          if (onDissipated) onDissipated();
+        }, 1100);
+      }, 1500);
+    }
+
+    /* =========================================================================
+       EYE GAZE TRACKING (PERÓN'S NATURAL PHOTOGRAPHIC EYES PRESERVED)
+    ========================================================================= */
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
+
+    function trackGaze(e) {
+      const rect = machineWrapper.getBoundingClientRect();
+      const eyeCenterX = rect.left + rect.width * 0.50;
+      const eyeCenterY = rect.top + rect.height * 0.38;
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const deltaX = (clientX - eyeCenterX) / (window.innerWidth * 0.5);
+      const deltaY = (clientY - eyeCenterY) / (window.innerHeight * 0.5);
+
+      // Subtle natural glint micro-movement within the iris
+      targetX = Math.max(-0.8, Math.min(0.8, deltaX * 1.0));
+      targetY = Math.max(-0.5, Math.min(0.5, deltaY * 0.8));
+    }
+
+    window.addEventListener('mousemove', trackGaze);
+    window.addEventListener('touchmove', trackGaze, { passive: true });
+
+    function renderEyeLoop() {
+      curX += (targetX - curX) * 0.15;
+      curY += (targetY - curY) * 0.15;
+
+      pupilL.style.transform = `translate(${curX}px, ${curY}px)`;
+      pupilR.style.transform = `translate(${curX}px, ${curY}px)`;
+
+      requestAnimationFrame(renderEyeLoop);
+    }
+    requestAnimationFrame(renderEyeLoop);
+
+    // Natural Blinking
+    function triggerBlink() {
+      if (!isConsulting) {
+        eyelidL.style.height = '100%';
+        eyelidR.style.height = '100%';
+        setTimeout(() => {
+          eyelidL.style.height = '0%';
+          eyelidR.style.height = '0%';
+        }, 110);
+      }
+      const nextBlink = Math.random() * 4000 + 2000;
+      setTimeout(triggerBlink, nextBlink);
+    }
+    setTimeout(triggerBlink, 2000);
+
+    /* =========================================================================
+       CANVAS PARTICLES: DUST IN GLASS & STEAM FROM KETTLE
+    ========================================================================= */
+    const dustCanvas = document.getElementById('dustCanvas');
+    const dCtx = dustCanvas.getContext('2d');
+    let dustParticles = [];
+
+    const steamCanvas = document.getElementById('steamCanvas');
+    const sCtx = steamCanvas.getContext('2d');
+    let steamParticles = [];
+
+    function resizeCanvases() {
+      dustCanvas.width = dustCanvas.offsetWidth;
+      dustCanvas.height = dustCanvas.offsetHeight;
+      steamCanvas.width = steamCanvas.offsetWidth;
+      steamCanvas.height = steamCanvas.offsetHeight;
+      resizeSmokeCanvas();
+    }
+
+    for (let i = 0; i < 24; i++) {
+      dustParticles.push({
+        x: Math.random() * 300,
+        y: Math.random() * 400,
+        r: Math.random() * 1.5 + 0.5,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: -Math.random() * 0.3 - 0.1,
+        alpha: Math.random() * 0.5 + 0.2
+      });
+    }
+
+    function createSteamPuff() {
+      if (steamParticles.length < 20) {
+        steamParticles.push({
+          x: (steamCanvas.width || 60) * 0.5 + (Math.random() - 0.5) * 4,
+          y: (steamCanvas.height || 100) * 0.9,
+          r: Math.random() * 2 + 2,
+          vx: (Math.random() - 0.5) * 0.3 + 0.15,
+          vy: -Math.random() * 0.6 - 0.4,
+          alpha: 0.45
+        });
+      }
+    }
+
+    function renderCanvases() {
+      // Dust
+      dCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+      dustParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y < 0) { p.y = dustCanvas.height; p.x = Math.random() * dustCanvas.width; }
+        if (p.x < 0) p.x = dustCanvas.width;
+        if (p.x > dustCanvas.width) p.x = 0;
+
+        dCtx.beginPath();
+        dCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        dCtx.fillStyle = `rgba(255, 230, 140, ${p.alpha})`;
+        dCtx.fill();
+      });
+
+      // Steam
+      sCtx.clearRect(0, 0, steamCanvas.width, steamCanvas.height);
+      if (Math.random() < 0.12) createSteamPuff();
+
+      for (let i = steamParticles.length - 1; i >= 0; i--) {
+        const sp = steamParticles[i];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.r += 0.18;
+        sp.alpha -= 0.005;
+
+        if (sp.alpha <= 0 || sp.y < 0) {
+          steamParticles.splice(i, 1);
+          continue;
+        }
+
+        sCtx.beginPath();
+        sCtx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
+        sCtx.fillStyle = `rgba(255, 255, 255, ${sp.alpha * 0.35})`;
+        sCtx.fill();
+      }
+
+      requestAnimationFrame(renderCanvases);
+    }
+
+    resizeCanvases();
+    window.addEventListener('resize', resizeCanvases);
+    requestAnimationFrame(renderCanvases);
+
+    /* =========================================================================
+       DOCTRINE QUOTE SELECTOR
+    ========================================================================= */
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function normalizeText(value) {
+      return value
+        .toLocaleLowerCase('es')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function getSeenQuoteIds() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(SEEN_QUOTES_KEY) || '[]');
+        if (Array.isArray(stored)) {
+          memorySeenQuoteIds = stored.filter(id => CITAS_VERIFICADAS.some(quote => quote.id === id));
+        }
+      } catch (error) { }
+      return [...memorySeenQuoteIds];
+    }
+
+    function saveSeenQuoteIds(ids) {
+      memorySeenQuoteIds = ids;
+      try {
+        localStorage.setItem(SEEN_QUOTES_KEY, JSON.stringify(ids));
+      } catch (error) { }
+    }
+
+    function getTopicScores(question) {
+      const normalizedQuestion = normalizeText(question);
+      return Object.fromEntries(
+        Object.entries(TOPIC_KEYWORDS).map(([topic, keywords]) => {
+          const score = keywords.reduce((total, keyword) => {
+            return total + (normalizedQuestion.includes(normalizeText(keyword)) ? 1 : 0);
+          }, 0);
+          return [topic, score];
+        })
+      );
+    }
+
+    function selectRelatedQuote(question) {
+      const topicScores = getTopicScores(question);
+      const scoredQuotes = CITAS_VERIFICADAS.map(quote => ({
+        quote,
+        score: quote.topics.reduce((total, topic) => total + (topicScores[topic] || 0), 0)
+      }));
+      const highestScore = Math.max(...scoredQuotes.map(item => item.score));
+      const relatedQuotes = highestScore > 0
+        ? scoredQuotes.filter(item => item.score === highestScore).map(item => item.quote)
+        : CITAS_VERIFICADAS.filter(quote => quote.topics.includes('verdad') || quote.topics.includes('humor'));
+
+      let seenIds = getSeenQuoteIds();
+      let availableQuotes = relatedQuotes.filter(quote => !seenIds.includes(quote.id));
+
+      if (!availableQuotes.length) {
+        availableQuotes = CITAS_VERIFICADAS.filter(quote => !seenIds.includes(quote.id));
+      }
+
+      if (!availableQuotes.length) {
+        seenIds = [];
+        availableQuotes = relatedQuotes;
+      }
+
+      const selectedQuote = pickRandom(availableQuotes);
+      saveSeenQuoteIds([...seenIds, selectedQuote.id]);
+      return selectedQuote;
+    }
+
+    function updateConsultationState() {
+      const queryLength = consultationInput.value.length;
+      const hasQuestion = consultationInput.value.trim().length >= 3;
+
+      consultationCounter.textContent = `${queryLength} / 220`;
+      machineWrapper.classList.toggle('has-question', hasQuestion);
+      triggerBtn.disabled = !hasQuestion || isConsulting;
+
+      if (!isConsulting) {
+        instructionHud.classList.remove('is-muted');
+        instructionHud.textContent = hasQuestion
+          ? '— NO TE OLVIDES DE APRETAR EL BOTÓN, COMPAÑERO —'
+          : '— ESCRIBÍ TU CONSULTA Y RECIBÍ EL AGUINALDO DE LA SUERTE —';
+      }
+    }
+
+    /* =========================================================================
+       TICKET ZOOM & NEW CONSULTATION INTERACTIONS
+    ========================================================================= */
+    function toggleTicketZoom(event) {
+      if (event) event.stopPropagation();
+      if (!slotDispenser.classList.contains('is-dispensed')) return;
+
+      const isZoomed = vintageTicket.classList.contains('is-zoomed');
+      if (isZoomed) {
+        closeTicketZoom();
+      } else {
+        // The machine is an isolated stacking context. Move the ticket to the
+        // document layer so the close-up sits above the darkened glass.
+        document.body.appendChild(vintageTicket);
+        vintageTicket.classList.add('is-zoomed');
+        ticketBackdrop.classList.add('active');
+      }
+    }
+
+    function closeTicketZoom(event) {
+      if (event) event.stopPropagation();
+      vintageTicket.classList.remove('is-zoomed');
+      ticketBackdrop.classList.remove('active');
+      if (vintageTicket.parentElement !== slotChute) {
+        slotChute.appendChild(vintageTicket);
+      }
+    }
+
+    function resetToNewConsultation(event) {
+      if (event) event.stopPropagation();
+      closeTicketZoom();
+
+      // Stop audio
+      audio.stopAllMusic();
+
+      // Retract ticket
+      slotDispenser.classList.remove('is-dispensed', 'is-dispensing', 'is-active');
+
+      // Return Perón to neutral state
+      machineWrapper.classList.remove('peron-celebrating', 'active-consultation');
+
+      // Re-display consultation input
+      consultationPanel.classList.remove('is-hidden');
+      consultationInput.disabled = false;
+      consultationInput.value = '';
+      consultationInput.focus();
+
+      isConsulting = false;
+      instructionHud.classList.remove('is-muted');
+      updateConsultationState();
+    }
+
+    /* =========================================================================
+       MAIN CONSULTATION RITUAL EXECUTION
+    ========================================================================= */
+    function startConsultation() {
+      if (isConsulting) return;
+
+      const currentQuestion = consultationInput.value.trim();
+      if (currentQuestion.length < 3) {
+        consultationInput.focus();
+        instructionHud.textContent = '— PRIMERO ESCRIBÍ UNA CONSULTA, COMPAÑERO —';
+        return;
+      }
+
+      const selectedQuote = selectRelatedQuote(currentQuestion);
+      isConsulting = true;
+
+      // Close any open zoomed view
+      closeTicketZoom();
+
+      // Hide consultation input smoothly to clear the slot aperture
+      consultationPanel.classList.add('is-hidden');
+      triggerBtn.disabled = true;
+
+      // Reset previous state
+      machineWrapper.classList.remove('peron-celebrating');
+      slotDispenser.classList.remove('is-dispensed', 'is-dispensing', 'is-active');
+
+      // 1. Audio init & Coin drop
+      audio.init();
+      audio.playCoinDrop();
+
+      triggerBtn.classList.add('pressed');
+      instructionHud.textContent = '— EL GENERAL ESTÁ MEDITANDO SU DOCTRINA... —';
+
+      // Coin drop animation
+      fallingCoin.classList.remove('drop');
+      void fallingCoin.offsetWidth;
+      fallingCoin.classList.add('drop');
+
+      setTimeout(() => triggerBtn.classList.remove('pressed'), 200);
+
+      // Populate Ticket Content
+      ticketQuote.textContent = selectedQuote.text;
+      ticketSource.textContent = selectedQuote.source;
+      ticketSource.href = QUOTE_SOURCE_URL;
+      ticketQuestion.textContent = currentQuestion;
+      ticketSerial.textContent = randInt(100000, 999999);
+
+      // 2. Machine activates: lamps flare & gears hum (BEHIND SMOKE!)
+      setTimeout(() => {
+        machineWrapper.classList.add('active-consultation');
+        audio.playGearHum(2.4);
+
+        // 3. TRIGGER TRANSLUCENT VOLUMETRIC SMOKE (IN FRONT OF LIGHTS & EYES)
+        triggerCabinSmokeEffect(
+          // On peak smoke coverage: reveal Perón with hands up!
+          () => {
+            machineWrapper.classList.add('peron-celebrating');
+          },
+          // On smoke fully dissipated:
+          () => {
+            machineWrapper.classList.remove('active-consultation');
+          }
+        );
+
+        // 4. IN THE PROCESS, TICKET DISPENSES PHYSICALLY FROM THE SLOT APERTURE
+        setTimeout(() => {
+          instructionHud.textContent = '— EMITIENDO LA BOLETA DE LA CONDUCCIÓN... —';
+          audio.playPrinterRatchet();
+
+          slotDispenser.classList.add('is-dispensing');
+
+          // The recognizable march begins as soon as the ballot becomes visible.
+          setTimeout(() => {
+            audio.playMarchaPeronistaMidi8Bit();
+          }, 450);
+
+          // Ticket settles at the bottom
+          setTimeout(() => {
+            slotDispenser.classList.remove('is-dispensing');
+            slotDispenser.classList.add('is-dispensed', 'is-active');
+            instructionHud.textContent = '— DOCTRINA ENTREGADA — TOCÁ EL TICKET PARA AMPLIAR O CONSULTÁ DE NUEVO —';
+            setTimeout(() => {
+              if (slotDispenser.classList.contains('is-dispensed')) {
+                instructionHud.classList.add('is-muted');
+              }
+            }, 1100);
+            isConsulting = false;
+          }, 4600);
+
+        }, 450);
+
+      }, 350);
+    }
+
+    /* =========================================================================
+       EVENT LISTENERS
+    ========================================================================= */
+    triggerBtn.addEventListener('click', startConsultation);
+    consultationInput.addEventListener('input', updateConsultationState);
+    consultationInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        startConsultation();
+      }
+    });
+
+    // Clicking the ticket expands it for easy reading
+    vintageTicket.addEventListener('click', e => {
+      if (e.target.closest('.ticket-btn') || e.target.closest('.ticket-close-badge')) return;
+      toggleTicketZoom(e);
+    });
+
+    ticketZoomBtn.addEventListener('click', toggleTicketZoom);
+    ticketNewBtn.addEventListener('click', resetToNewConsultation);
+    ticketCloseBadge.addEventListener('click', closeTicketZoom);
+    ticketBackdrop.addEventListener('click', closeTicketZoom);
+
+    updateConsultationState();
+  </script>
+</body>
+
+</html>
