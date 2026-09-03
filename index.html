@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-AR">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#040201" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; media-src 'self'; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; object-src 'none'; base-uri 'none'; form-action 'none'" />
   <title>PERÓN — La Máquina de la Conducción Política</title>
   <meta name="description"
     content="La legendaria máquina animatrónica de la fortuna de Juan Domingo Perón. Consultá tu destino y recibí tu doctrina de conducción." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Courier+Prime:wght@700&family=Montserrat:wght@800;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&amp;family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,400;1,700&amp;family=IM+Fell+English:ital@0;1&amp;family=Special+Elite&amp;family=Courier+Prime:wght@700&amp;family=Montserrat:wght@800;900&amp;display=swap"
     rel="stylesheet" />
   <style>
     *,
@@ -99,6 +104,7 @@
       border-radius: 12px;
       overflow: hidden;
       isolation: isolate;
+      contain: layout paint;
       background: #000;
       opacity: 0;
       transform: scale(0.98);
@@ -311,16 +317,6 @@
       height: 100% !important;
     }
 
-    /* STEAM RISING FROM THE PAVA (KETTLE) */
-    .steam-canvas {
-      position: absolute;
-      top: 32%;
-      left: 3%;
-      width: 28%;
-      height: 55%;
-      pointer-events: none;
-      opacity: 0.65;
-    }
 
     /* DUST PARTICLES IN GLASS CABINET */
     .dust-canvas {
@@ -711,48 +707,29 @@
     .slot-dispenser.is-dispensing .vintage-ticket {
       opacity: 1;
       transform-origin: top center;
-      will-change: transform, clip-path, opacity;
-      animation: ticketEmergeDownwards 4.6s cubic-bezier(0.14, 0.68, 0.2, 1) forwards;
+      will-change: transform, opacity;
+      animation: ticketEmergeDownwards 3.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
     }
 
     @keyframes ticketEmergeDownwards {
       0% {
-        transform: translateY(0) scaleX(0.16) scaleY(0.08);
-        clip-path: inset(0 0 94% 0 round 1px);
-        opacity: 0;
-      }
-      7% {
-        transform: translateY(0) scaleX(0.22) scaleY(0.16);
-        clip-path: inset(0 0 85% 0 round 1px);
+        transform: translateY(-100%);
         opacity: 1;
       }
-      18% {
-        transform: translateY(0) scaleX(0.48) scaleY(0.34) skewX(-0.7deg);
-        clip-path: inset(0 0 68% 0 round 1px);
-      }
-      34% {
-        transform: translateY(0) scaleX(0.88) scaleY(0.57) skewX(0.9deg);
-        clip-path: inset(0 0 45% 0 round 1px);
-      }
       50% {
-        transform: translateY(0) scaleX(1.055) scaleY(0.74) skewX(-0.45deg);
-        clip-path: inset(0 0 28% 0 round 1px);
+        transform: translateY(-5%) rotateZ(0.6deg);
       }
-      67% {
-        transform: translateY(0) scaleX(0.972) scaleY(0.88) skewX(0.25deg);
-        clip-path: inset(0 0 14% 0 round 1px);
+      65% {
+        transform: translateY(2%) rotateZ(-1.2deg);
       }
-      82% {
-        transform: translateY(0) scaleX(1.018) scaleY(0.975);
-        clip-path: inset(0 0 4% 0 round 1px);
+      80% {
+        transform: translateY(-1%) rotateZ(0.6deg);
       }
-      93% {
-        transform: translateY(2px) scaleX(0.992) scaleY(1.018);
-        clip-path: inset(0 0 0 0 round 1px);
+      90% {
+        transform: translateY(0.5%) rotateZ(-0.2deg);
       }
       100% {
-        transform: translateY(0) scaleX(1) scaleY(1);
-        clip-path: inset(0 0 0 0 round 1px);
+        transform: translateY(0) rotateZ(0deg);
         opacity: 1;
       }
     }
@@ -971,6 +948,7 @@
     /* ACTION BAR ON THE DISPENSED TICKET */
     .ticket-controls {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       gap: 6px;
       margin-top: 5px;
@@ -1000,6 +978,12 @@
       background: #1e293b;
       color: #ffffff;
       transform: scale(1.04);
+    }
+
+    .ticket-btn:disabled {
+      opacity: 0.48;
+      cursor: wait;
+      transform: none;
     }
 
     /* ZOOMED VIEW (WHEN USER CLICKS TICKET TO READ UP-CLOSE) */
@@ -1108,15 +1092,14 @@
     ========================================================================= */
     .vintage-ticket {
       background-color: #e8e2d2;
-      background-image:
-        linear-gradient(rgba(244, 240, 226, 0.93), rgba(224, 217, 198, 0.94)),
-        url('boleta-1951-reference.jpg');
-      background-position: center;
-      background-size: cover;
+      background-image: url('boleta.png');
+      background-position: top center;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
       border: 1.5px solid #24231f;
       outline: none;
       border-radius: 1px;
-      padding: 10px 12px 9px;
+      padding: 110px 12px 15px;
       color: #211f1a;
       box-shadow:
         0 14px 34px rgba(0, 0, 0, 0.9),
@@ -1130,93 +1113,6 @@
       inset: 4px;
       border: 1px solid rgba(39, 36, 29, 0.38);
       pointer-events: none;
-    }
-
-    .ballot-header {
-      display: grid;
-      grid-template-columns: 50px 1fr 50px;
-      align-items: start;
-      gap: 8px;
-      min-height: 61px;
-      margin: 0 0 5px;
-      padding: 0 2px 5px;
-      border-bottom: 1.5px solid #292720;
-      text-align: center;
-    }
-
-    .ballot-header::after { display: none; }
-
-    .ballot-portrait {
-      position: relative;
-      width: 50px;
-      height: 54px;
-      margin: 0;
-      border: 1px solid #26241f;
-      background-color: #d8d2c1;
-      background-image: url('boleta-1951-reference.jpg');
-      background-repeat: no-repeat;
-      filter: grayscale(1) contrast(1.35);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-    }
-
-    .ballot-portrait-peron {
-      background-size: 314px 461px;
-      background-position: -18px -5px;
-    }
-
-    .ballot-portrait-evita {
-      background-size: 314px 461px;
-      background-position: -250px -9px;
-    }
-
-    .ballot-portrait figcaption {
-      position: absolute;
-      left: -2px;
-      right: -2px;
-      bottom: -10px;
-      color: #24221d;
-      font-family: 'Courier Prime', monospace;
-      font-size: 5.7px;
-      font-weight: 700;
-      letter-spacing: 0.35px;
-      white-space: nowrap;
-    }
-
-    .ballot-party {
-      display: grid;
-      grid-template-columns: 1fr 35px 1fr;
-      align-items: center;
-      justify-items: center;
-      gap: 4px;
-      padding-top: 3px;
-    }
-
-    .ballot-party-name {
-      font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(7px, 1.65vw, 9px);
-      font-weight: 900;
-      letter-spacing: 0.35px;
-      line-height: 1;
-      text-transform: uppercase;
-    }
-
-    .ballot-emblem {
-      width: 34px;
-      height: 43px;
-      object-fit: contain;
-      filter: grayscale(1) contrast(1.45) brightness(0.82);
-      mix-blend-mode: multiply;
-    }
-
-    .ballot-election-line {
-      margin: 5px 2px 6px;
-      padding-bottom: 4px;
-      border-bottom: 1px dotted #3e3a31;
-      font-family: 'Courier Prime', monospace;
-      font-size: clamp(6.7px, 1.55vw, 8px);
-      font-weight: 700;
-      letter-spacing: 0.75px;
-      text-align: center;
     }
 
     .ticket-body {
@@ -1348,31 +1244,12 @@
     }
 
     .vintage-ticket.is-zoomed {
-      padding: 20px 24px 18px !important;
+      padding: 130px 24px 24px !important;
       background-color: #e8e2d2 !important;
       box-shadow:
         0 25px 70px rgba(0, 0, 0, 0.98),
         0 0 0 1px rgba(235, 226, 198, 0.3) !important;
     }
-
-    .vintage-ticket.is-zoomed .ballot-header {
-      grid-template-columns: 66px 1fr 66px;
-      min-height: 82px;
-      gap: 12px;
-    }
-
-    .vintage-ticket.is-zoomed .ballot-portrait {
-      width: 66px;
-      height: 70px;
-      background-size: 414px 608px;
-    }
-
-    .vintage-ticket.is-zoomed .ballot-portrait-peron { background-position: -24px -7px; }
-    .vintage-ticket.is-zoomed .ballot-portrait-evita { background-position: -330px -12px; }
-    .vintage-ticket.is-zoomed .ballot-party { grid-template-columns: 1fr 48px 1fr; }
-    .vintage-ticket.is-zoomed .ballot-emblem { width: 46px; height: 58px; }
-    .vintage-ticket.is-zoomed .ballot-party-name { font-size: 11px; }
-    .vintage-ticket.is-zoomed .ballot-election-line { font-size: 9px; margin-top: 8px; }
     .vintage-ticket.is-zoomed .ballot-message-label { font-size: 14px; }
     .vintage-ticket.is-zoomed .ticket-quote { font-size: 20px !important; line-height: 1.38 !important; }
     .vintage-ticket.is-zoomed .ticket-signature { font-size: 10px !important; }
@@ -1639,6 +1516,38 @@
       color: rgba(212, 167, 44, 0.75);
       letter-spacing: 1px;
     }
+
+    html.low-power .lamp-glow {
+      filter: none;
+    }
+
+    html.low-power .smoke-veil {
+      filter: blur(4px);
+    }
+
+    html.low-power .ticket-backdrop {
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .preloader-meter-fill::after {
+        display: none;
+      }
+
+      .ticket-backdrop {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+    }
   </style>
 </head>
 
@@ -1717,7 +1626,7 @@
       </div>
 
       <div class="preloader-status-text" id="preloaderStatus">Iniciando maquinaria doctrinaria...</div>
-      <div class="preloader-bytes" id="preloaderBytes">0.0 MB / 80.0 MB</div>
+      <div class="preloader-bytes" id="preloaderBytes">0.0 MB / 1.6 MB</div>
     </div>
   </div>
 
@@ -1728,10 +1637,22 @@
 
   <div class="machine-wrapper" id="machineWrapper">
     <!-- LAYER 1: PERÓN NEUTRAL (REST STATE) -->
-    <img src="peron-neutral.png" data-src="peron-neutral.png" alt="" aria-hidden="true" class="peron-layer peron-neutral" id="peronNeutral" />
+    <picture>
+      <source type="image/webp"
+        srcset="peron-neutral-768.webp 768w, peron-neutral-1280.webp 1280w"
+        sizes="(orientation: portrait) 100vw, 56vh" />
+      <img src="peron-neutral-fallback.jpg" alt="" aria-hidden="true" class="peron-layer peron-neutral" id="peronNeutral"
+        width="1280" height="2287" loading="eager" decoding="async" fetchpriority="high" draggable="false" />
+    </picture>
 
     <!-- LAYER 2: PERÓN HANDS UP (TICKET DELIVERY & CELEBRATION REACTION) -->
-    <img src="peron-manos-arriba.png" data-src="peron-manos-arriba.png" alt="" aria-hidden="true" class="peron-layer peron-hands-up" id="peronHandsUp" />
+    <picture>
+      <source type="image/webp"
+        srcset="peron-manos-arriba-768.webp 768w, peron-manos-arriba-1280.webp 1280w"
+        sizes="(orientation: portrait) 100vw, 56vh" />
+      <img src="peron-manos-arriba-fallback.jpg" alt="" aria-hidden="true" class="peron-layer peron-hands-up" id="peronHandsUp"
+        width="1280" height="2287" loading="eager" decoding="async" fetchpriority="high" draggable="false" />
+    </picture>
 
     <!-- LAYER 3: CABIN INTERIOR STAGE (LIGHTS, DUST, STEAM & EYES - LOCATED INSIDE BOOTH BEHIND SMOKE!) -->
     <div class="cabin-interior-stage" id="cabinInteriorStage">
@@ -1742,8 +1663,6 @@
       <!-- FLOATING DUST MOTES IN GLASS -->
       <canvas class="dust-canvas" id="dustCanvas"></canvas>
 
-      <!-- STEAM SPOUT FROM THE PAVA (MATE KETTLE) -->
-      <canvas class="steam-canvas" id="steamCanvas"></canvas>
 
       <!-- INTERACTIVE EYE GAZE TRACKING (PRECISELY CENTERED ON REAL PUPILS: LEFT X=47.36%, RIGHT X=53.39%, Y=38.10%) -->
       <div class="eye-track left" id="eyeTrackL">
@@ -1764,10 +1683,22 @@
     </div>
 
     <!-- LAYER 5: GLASS TEXTURE ON CENTRAL APERTURE -->
-    <img src="vidrio.png" data-src="vidrio.png" alt="" aria-hidden="true" class="glass-layer" id="glassLayer" />
+    <picture>
+      <source type="image/webp"
+        srcset="vidrio-768.webp 768w, vidrio-1280.webp 1280w"
+        sizes="(orientation: portrait) 70vw, 40vh" />
+      <img src="vidrio-fallback.png" alt="" aria-hidden="true" class="glass-layer" id="glassLayer"
+        width="1280" height="1428" loading="eager" decoding="async" fetchpriority="high" draggable="false" />
+    </picture>
 
     <!-- LAYER 6: FRONT CABIN WITH CENTRAL TRANSPARENCY & CHROME FRAME -->
-    <img src="cabina.png" data-src="cabina.png" alt="" aria-hidden="true" class="cabin-layer" id="cabinLayer" />
+    <picture>
+      <source type="image/webp"
+        srcset="cabina-768.webp 768w, cabina-1280.webp 1280w"
+        sizes="(orientation: portrait) 100vw, 56vh" />
+      <img src="cabina-fallback.png" alt="" aria-hidden="true" class="cabin-layer" id="cabinLayer"
+        width="1280" height="2293" loading="eager" decoding="async" fetchpriority="high" draggable="false" />
+    </picture>
 
     <!-- LAYER 7: FRONT INTERACTIVE CONTROLS (OUTSIDE BOOTH) -->
     <div class="interactive-stage" id="interactiveStage">
@@ -1796,23 +1727,7 @@
           <div class="vintage-ticket" id="vintageTicket" title="Tocar para ampliar lectura">
             <div class="ticket-close-badge" id="ticketCloseBadge" title="Cerrar vista previa">✕</div>
 
-            <header class="ticket-header ballot-header">
-              <figure class="ballot-portrait ballot-portrait-peron" role="img" aria-label="Juan Domingo Perón">
-                <figcaption>J. D. PERÓN</figcaption>
-              </figure>
 
-              <div class="ballot-party">
-                <div class="ballot-party-name">PARTIDO</div>
-                <img class="ballot-emblem" src="escudo-justicialista.svg" alt="Escudo del Partido Justicialista" />
-                <div class="ballot-party-name">JUSTICIALISTA</div>
-              </div>
-
-              <figure class="ballot-portrait ballot-portrait-evita" role="img" aria-label="Eva Perón">
-                <figcaption>EVA PERÓN</figcaption>
-              </figure>
-            </header>
-
-            <div class="ballot-election-line">ELECCIÓN DOCTRINARIA · BOLETA DE LA CONDUCCIÓN</div>
 
             <div class="ticket-body">
               <div class="ticket-consultation">
@@ -1835,6 +1750,7 @@
 
             <div class="ticket-controls">
               <button class="ticket-btn" id="ticketZoomBtn">🔍 AMPLIAR</button>
+              <button class="ticket-btn" id="ticketShareBtn" aria-label="Compartir la boleta como imagen" disabled>↗ COMPARTIR</button>
               <button class="ticket-btn" id="ticketNewBtn">↺ NUEVA CONSULTA</button>
             </div>
           </div>
@@ -2367,6 +2283,7 @@
     const ticketQuestion = document.getElementById('ticketQuestion');
     const ticketSerial = document.getElementById('ticketSerial');
     const ticketZoomBtn = document.getElementById('ticketZoomBtn');
+    const ticketShareBtn = document.getElementById('ticketShareBtn');
     const ticketNewBtn = document.getElementById('ticketNewBtn');
     const ticketCloseBadge = document.getElementById('ticketCloseBadge');
     const ticketBackdrop = document.getElementById('ticketBackdrop');
@@ -2377,20 +2294,26 @@
     const smokeCtx = smokeCanvas.getContext('2d');
     const smokeVeil = document.getElementById('smokeVeil');
 
+    const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const isLowPowerDevice = reducedMotionMedia.matches
+      || (navigator.deviceMemory && navigator.deviceMemory <= 4)
+      || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+    document.documentElement.classList.toggle('low-power', Boolean(isLowPowerDevice));
+
     /* =========================================================================
        ASSET PRELOADER WITH REAL-TIME PERCENTAGE ENGINE
     ========================================================================= */
     const PRELOAD_ASSETS = [
-      { id: 'cabin', url: 'cabina.png', size: 21731794, elementId: 'cabinLayer' },
-      { id: 'peronNeutral', url: 'peron-neutral.png', size: 26610941, elementId: 'peronNeutral' },
-      { id: 'peronHands', url: 'peron-manos-arriba.png', size: 26377354, elementId: 'peronHandsUp' },
-      { id: 'glass', url: 'vidrio.png', size: 5175553, elementId: 'glassLayer' },
-      { id: 'boleta', url: 'boleta-1951-reference.jpg', size: 84805 },
+      { id: 'cabin', url: 'cabina-1280.webp', size: 379446, elementId: 'cabinLayer' },
+      { id: 'peronNeutral', url: 'peron-neutral-1280.webp', size: 504060, elementId: 'peronNeutral' },
+      { id: 'peronHands', url: 'peron-manos-arriba-1280.webp', size: 498060, elementId: 'peronHandsUp' },
+      { id: 'glass', url: 'vidrio-1280.webp', size: 112930, elementId: 'glassLayer' },
+      { id: 'boleta', url: 'boleta.png', size: 2239982 },
       { id: 'escudo', url: 'escudo-justicialista.svg', size: 14184 }
     ];
 
-    const TOTAL_ASSET_BYTES = PRELOAD_ASSETS.reduce((sum, a) => sum + a.size, 0); // 79,994,631 bytes
-    const TOTAL_ASSET_MB = (TOTAL_ASSET_BYTES / 1000000).toFixed(1); // 80.0 MB
+    const TOTAL_ASSET_BYTES = PRELOAD_ASSETS.reduce((sum, a) => sum + a.size, 0);
+    const TOTAL_ASSET_MB = (TOTAL_ASSET_BYTES / 1000000).toFixed(1);
 
     const preloaderOverlay = document.getElementById('preloaderOverlay');
     const preloaderPercent = document.getElementById('preloaderPercent');
@@ -2456,74 +2379,50 @@
     }
 
     async function loadAssetItem(asset) {
-      try {
-        const res = await fetch(asset.url);
-        if (!res.ok) throw new Error('Fetch failed: ' + res.status);
-        const reader = res.body.getReader();
-        const chunks = [];
-        let received = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          received += value.length;
-          assetLoadedBytes.set(asset.url, received);
-          refreshTargetPercent();
-        }
-
+      const markComplete = () => {
         assetLoadedBytes.set(asset.url, asset.size);
         refreshTargetPercent();
+      };
 
-        const blob = new Blob(chunks);
-        const objectUrl = URL.createObjectURL(blob);
-        return { asset, objectUrl };
+      try {
+        const existingElement = asset.elementId
+          ? document.getElementById(asset.elementId)
+          : null;
+
+        if (existingElement) {
+          if (!existingElement.complete) {
+            await new Promise((resolve, reject) => {
+              existingElement.addEventListener('load', resolve, { once: true });
+              existingElement.addEventListener('error', reject, { once: true });
+            });
+          }
+          if (existingElement.decode) {
+            await existingElement.decode();
+          }
+        } else {
+          const image = new Image();
+          image.decoding = 'async';
+          image.src = asset.url;
+          if (image.decode) {
+            await image.decode();
+          } else {
+            await new Promise((resolve, reject) => {
+              image.onload = resolve;
+              image.onerror = reject;
+            });
+          }
+        }
       } catch (err) {
-        // Fallback for file:// or fetch blocking: load via Image
-        return new Promise(resolve => {
-          const img = new Image();
-          let simulated = 0;
-          const timer = setInterval(() => {
-            if (simulated < asset.size * 0.85) {
-              simulated += asset.size * 0.12;
-              assetLoadedBytes.set(asset.url, simulated);
-              refreshTargetPercent();
-            }
-          }, 60);
-
-          img.onload = img.onerror = () => {
-            clearInterval(timer);
-            assetLoadedBytes.set(asset.url, asset.size);
-            refreshTargetPercent();
-            resolve({ asset, objectUrl: asset.url });
-          };
-          img.src = asset.url;
-        });
+        console.warn(`No se pudo precargar ${asset.url}; continúa el fallback del navegador.`);
       }
+
+      markComplete();
     }
 
     async function runPreloader() {
       tickerRaf = requestAnimationFrame(updatePreloaderDisplay);
 
-      const results = await Promise.all(PRELOAD_ASSETS.map(loadAssetItem));
-
-      // Connect object URLs to DOM elements
-      for (const { asset, objectUrl } of results) {
-        if (asset.elementId) {
-          const el = document.getElementById(asset.elementId);
-          if (el && objectUrl) {
-            el.src = objectUrl;
-          }
-        }
-      }
-
-      // Ensure all machine visual layers are completely decoded in memory
-      const decodePromises = ['cabinLayer', 'peronNeutral', 'peronHandsUp', 'glassLayer']
-        .map(id => document.getElementById(id))
-        .filter(el => el && el.decode)
-        .map(el => el.decode().catch(() => {}));
-
-      await Promise.all(decodePromises);
+      await Promise.all(PRELOAD_ASSETS.map(loadAssetItem));
 
       // Trigger 100% completion
       targetPercent = 100;
@@ -2559,7 +2458,7 @@
         targetPercent = 100;
         isPreloadDone = true;
       }
-    }, 18000);
+    }, 8000);
 
     // Initialize asset preloading
     runPreloader();
@@ -2574,6 +2473,7 @@
     let isGeneratingSmoke = false;
     let smokeSpawnInterval = null;
     let smokeStamp = null;
+    let smokeRafId = null;
 
     function initSmokeStamp() {
       smokeStamp = document.createElement('canvas');
@@ -2619,7 +2519,14 @@
       });
     }
 
+    function scheduleSmokeFrame() {
+      if (smokeRafId === null && !document.hidden) {
+        smokeRafId = requestAnimationFrame(updateSmokeLoop);
+      }
+    }
+
     function updateSmokeLoop() {
+      smokeRafId = null;
       smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
 
       for (let i = smokeParticles.length - 1; i >= 0; i--) {
@@ -2649,22 +2556,27 @@
         smokeCtx.restore();
       }
 
-      requestAnimationFrame(updateSmokeLoop);
+      if (smokeParticles.length || isGeneratingSmoke) {
+        scheduleSmokeFrame();
+      }
     }
-    requestAnimationFrame(updateSmokeLoop);
 
     function triggerCabinSmokeEffect(onPeakCover, onDissipated) {
       smokeParticles = [];
       isGeneratingSmoke = true;
       resizeSmokeCanvas();
       smokeChamber.classList.add('is-smoking');
+      scheduleSmokeFrame();
 
       if (smokeSpawnInterval) clearInterval(smokeSpawnInterval);
+      const smokeIntervalMs = isLowPowerDevice ? 90 : 60;
+      const puffsPerBurst = isLowPowerDevice ? 1 : 2;
       smokeSpawnInterval = setInterval(() => {
-        if (isGeneratingSmoke) {
-          for (let k = 0; k < 4; k++) spawnSmokePuff();
+        if (isGeneratingSmoke && !document.hidden && !reducedMotionMedia.matches) {
+          for (let k = 0; k < puffsPerBurst; k++) spawnSmokePuff();
+          scheduleSmokeFrame();
         }
-      }, 40);
+      }, smokeIntervalMs);
 
       // Translucent atmospheric smoke veil (max 0.65 opacity)
       smokeVeil.style.opacity = '0.65';
@@ -2675,6 +2587,7 @@
 
         isGeneratingSmoke = false;
         clearInterval(smokeSpawnInterval);
+        smokeSpawnInterval = null;
 
         // Begin dissipation
         smokeVeil.style.opacity = '0';
@@ -2698,6 +2611,7 @@
     let targetY = 0;
     let curX = 0;
     let curY = 0;
+    let eyeRafId = null;
 
     function trackGaze(e) {
       const rect = machineWrapper.getBoundingClientRect();
@@ -2713,21 +2627,29 @@
       // Subtle natural glint micro-movement within the iris
       targetX = Math.max(-0.8, Math.min(0.8, deltaX * 1.0));
       targetY = Math.max(-0.5, Math.min(0.5, deltaY * 0.8));
+      scheduleEyeRender();
     }
 
-    window.addEventListener('mousemove', trackGaze);
-    window.addEventListener('touchmove', trackGaze, { passive: true });
+    window.addEventListener('pointermove', trackGaze, { passive: true });
+
+    function scheduleEyeRender() {
+      if (eyeRafId === null && !document.hidden) {
+        eyeRafId = requestAnimationFrame(renderEyeLoop);
+      }
+    }
 
     function renderEyeLoop() {
+      eyeRafId = null;
       curX += (targetX - curX) * 0.15;
       curY += (targetY - curY) * 0.15;
 
       pupilL.style.transform = `translate(${curX}px, ${curY}px)`;
       pupilR.style.transform = `translate(${curX}px, ${curY}px)`;
 
-      requestAnimationFrame(renderEyeLoop);
+      if (Math.abs(targetX - curX) > 0.01 || Math.abs(targetY - curY) > 0.01) {
+        scheduleEyeRender();
+      }
     }
-    requestAnimationFrame(renderEyeLoop);
 
     // Natural Blinking
     function triggerBlink() {
@@ -2745,25 +2667,25 @@
     setTimeout(triggerBlink, 2000);
 
     /* =========================================================================
-       CANVAS PARTICLES: DUST IN GLASS & STEAM FROM KETTLE
+       CANVAS PARTICLES: DUST MOTES IN GLASS CABINET
     ========================================================================= */
     const dustCanvas = document.getElementById('dustCanvas');
-    const dCtx = dustCanvas.getContext('2d');
+    const dCtx = dustCanvas ? dustCanvas.getContext('2d') : null;
     let dustParticles = [];
-
-    const steamCanvas = document.getElementById('steamCanvas');
-    const sCtx = steamCanvas.getContext('2d');
-    let steamParticles = [];
+    let dustRafId = null;
+    let lastDustFrame = 0;
+    const dustFrameInterval = 1000 / (isLowPowerDevice ? 20 : 30);
 
     function resizeCanvases() {
-      dustCanvas.width = dustCanvas.offsetWidth;
-      dustCanvas.height = dustCanvas.offsetHeight;
-      steamCanvas.width = steamCanvas.offsetWidth;
-      steamCanvas.height = steamCanvas.offsetHeight;
+      if (dustCanvas) {
+        dustCanvas.width = dustCanvas.offsetWidth;
+        dustCanvas.height = dustCanvas.offsetHeight;
+      }
       resizeSmokeCanvas();
     }
 
-    for (let i = 0; i < 24; i++) {
+    const dustParticleCount = reducedMotionMedia.matches ? 0 : (isLowPowerDevice ? 12 : 20);
+    for (let i = 0; i < dustParticleCount; i++) {
       dustParticles.push({
         x: Math.random() * 300,
         y: Math.random() * 400,
@@ -2774,63 +2696,63 @@
       });
     }
 
-    function createSteamPuff() {
-      if (steamParticles.length < 20) {
-        steamParticles.push({
-          x: (steamCanvas.width || 60) * 0.5 + (Math.random() - 0.5) * 4,
-          y: (steamCanvas.height || 100) * 0.9,
-          r: Math.random() * 2 + 2,
-          vx: (Math.random() - 0.5) * 0.3 + 0.15,
-          vy: -Math.random() * 0.6 - 0.4,
-          alpha: 0.45
+    function renderCanvases(timestamp = 0) {
+      dustRafId = null;
+      if (document.hidden) return;
+
+      // Floating dust particles
+      if (dustCanvas && dCtx && timestamp - lastDustFrame >= dustFrameInterval) {
+        lastDustFrame = timestamp;
+        dCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+        dustParticles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.y < 0) { p.y = dustCanvas.height; p.x = Math.random() * dustCanvas.width; }
+          if (p.x < 0) p.x = dustCanvas.width;
+          if (p.x > dustCanvas.width) p.x = 0;
+
+          dCtx.beginPath();
+          dCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          dCtx.fillStyle = `rgba(255, 230, 140, ${p.alpha})`;
+          dCtx.fill();
         });
       }
-    }
 
-    function renderCanvases() {
-      // Dust
-      dCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
-      dustParticles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.y < 0) { p.y = dustCanvas.height; p.x = Math.random() * dustCanvas.width; }
-        if (p.x < 0) p.x = dustCanvas.width;
-        if (p.x > dustCanvas.width) p.x = 0;
-
-        dCtx.beginPath();
-        dCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        dCtx.fillStyle = `rgba(255, 230, 140, ${p.alpha})`;
-        dCtx.fill();
-      });
-
-      // Steam
-      sCtx.clearRect(0, 0, steamCanvas.width, steamCanvas.height);
-      if (Math.random() < 0.12) createSteamPuff();
-
-      for (let i = steamParticles.length - 1; i >= 0; i--) {
-        const sp = steamParticles[i];
-        sp.x += sp.vx;
-        sp.y += sp.vy;
-        sp.r += 0.18;
-        sp.alpha -= 0.005;
-
-        if (sp.alpha <= 0 || sp.y < 0) {
-          steamParticles.splice(i, 1);
-          continue;
-        }
-
-        sCtx.beginPath();
-        sCtx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
-        sCtx.fillStyle = `rgba(255, 255, 255, ${sp.alpha * 0.35})`;
-        sCtx.fill();
+      if (dustParticles.length) {
+        dustRafId = requestAnimationFrame(renderCanvases);
       }
-
-      requestAnimationFrame(renderCanvases);
     }
 
     resizeCanvases();
-    window.addEventListener('resize', resizeCanvases);
-    requestAnimationFrame(renderCanvases);
+    let resizeRafId = null;
+    window.addEventListener('resize', () => {
+      if (resizeRafId !== null) return;
+      resizeRafId = requestAnimationFrame(() => {
+        resizeRafId = null;
+        resizeCanvases();
+      });
+    });
+    if (dustParticles.length) {
+      dustRafId = requestAnimationFrame(renderCanvases);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (dustRafId !== null) cancelAnimationFrame(dustRafId);
+        if (eyeRafId !== null) cancelAnimationFrame(eyeRafId);
+        if (smokeRafId !== null) cancelAnimationFrame(smokeRafId);
+        dustRafId = null;
+        eyeRafId = null;
+        smokeRafId = null;
+        return;
+      }
+
+      if (dustParticles.length && dustRafId === null) {
+        dustRafId = requestAnimationFrame(renderCanvases);
+      }
+      scheduleEyeRender();
+      if (smokeParticles.length || isGeneratingSmoke) scheduleSmokeFrame();
+    });
 
     /* =========================================================================
        DOCTRINE QUOTE SELECTOR
@@ -2919,6 +2841,460 @@
     }
 
     /* =========================================================================
+       SHAREABLE 1951-STYLE BALLOT IMAGE
+    ========================================================================= */
+    let preparedShareBlob = null;
+    let sharePreparationId = 0;
+    let sharePreparationTimerId = null;
+    let shareIdleHandle = null;
+    let shareNoticeTimeoutId = null;
+    const shareImageCache = new Map();
+
+    function loadShareImage(src) {
+      if (shareImageCache.has(src)) return shareImageCache.get(src);
+
+      const imagePromise = new Promise((resolve, reject) => {
+        const image = new Image();
+        image.decoding = 'async';
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+        image.src = src;
+      });
+
+      shareImageCache.set(src, imagePromise);
+      return imagePromise;
+    }
+
+    function wrapCanvasText(ctx, text, maxWidth) {
+      const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+      const lines = [];
+      let currentLine = '';
+
+      words.forEach(word => {
+        const candidate = currentLine ? `${currentLine} ${word}` : word;
+        if (ctx.measureText(candidate).width <= maxWidth) {
+          currentLine = candidate;
+          return;
+        }
+
+        if (currentLine) lines.push(currentLine);
+        currentLine = '';
+
+        if (ctx.measureText(word).width <= maxWidth) {
+          currentLine = word;
+          return;
+        }
+
+        let fragment = '';
+        [...word].forEach(character => {
+          const fragmentCandidate = fragment + character;
+          if (ctx.measureText(fragmentCandidate).width > maxWidth && fragment) {
+            lines.push(fragment);
+            fragment = character;
+          } else {
+            fragment = fragmentCandidate;
+          }
+        });
+        currentLine = fragment;
+      });
+
+      if (currentLine) lines.push(currentLine);
+      return lines.length ? lines : [''];
+    }
+
+    function drawFittedTextBlock(ctx, text, options) {
+      const {
+        x, y, maxWidth, maxHeight, maxFontSize, minFontSize,
+        fontFamily, fontWeight = '400', fontStyle = 'normal',
+        lineHeightRatio = 1.25, color = '#211f1a', align = 'center'
+      } = options;
+
+      let fontSize = maxFontSize;
+      let lineHeight = fontSize * lineHeightRatio;
+      let lines = [];
+
+      while (fontSize >= minFontSize) {
+        ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+        lines = wrapCanvasText(ctx, text, maxWidth);
+        lineHeight = fontSize * lineHeightRatio;
+        if (lines.length * lineHeight <= maxHeight) break;
+        fontSize -= 1;
+      }
+
+      fontSize = Math.max(fontSize, minFontSize);
+      ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+      lines = wrapCanvasText(ctx, text, maxWidth);
+      lineHeight = fontSize * lineHeightRatio;
+
+      const maxLines = Math.max(1, Math.floor(maxHeight / lineHeight));
+      if (lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        let lastLine = lines[maxLines - 1];
+        while (lastLine && ctx.measureText(`${lastLine}…`).width > maxWidth) {
+          lastLine = lastLine.slice(0, -1);
+        }
+        lines[maxLines - 1] = `${lastLine.trimEnd()}…`;
+      }
+
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.textBaseline = 'top';
+      ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+      lines.forEach((line, index) => ctx.fillText(line, x, y + (index * lineHeight)));
+      ctx.restore();
+
+      return y + (lines.length * lineHeight);
+    }
+
+    function drawBallotPortrait(ctx, image, crop, x, y, width, height, caption) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, width, height);
+      ctx.clip();
+      ctx.filter = 'grayscale(1) contrast(1.3)';
+      ctx.drawImage(image, crop.x, crop.y, crop.width, crop.height, x, y, width, height);
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = '#27251f';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, y, width, height);
+      ctx.fillStyle = '#27251f';
+      ctx.font = '700 20px "Courier Prime", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(caption, x + (width / 2), y + height + 27);
+      ctx.restore();
+    }
+
+    function drawPortraitPlaceholder(ctx, x, y, width, height, caption) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(49, 46, 39, 0.08)';
+      ctx.fillRect(x, y, width, height);
+      ctx.strokeStyle = '#27251f';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, y, width, height);
+      ctx.fillStyle = '#27251f';
+      ctx.font = '700 20px "Courier Prime", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(caption, x + (width / 2), y + height + 27);
+      ctx.restore();
+    }
+
+    async function renderShareBallot(includeImages = true) {
+      if (document.fonts && document.fonts.ready) {
+        try { await document.fonts.ready; } catch (error) { }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1350;
+      const ctx = canvas.getContext('2d', { alpha: false });
+
+      const paperGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      paperGradient.addColorStop(0, '#f1eee3');
+      paperGradient.addColorStop(0.5, '#e4decd');
+      paperGradient.addColorStop(1, '#d8d0bb');
+      ctx.fillStyle = paperGradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const numericSerial = Number(ticketSerial.textContent) || 1951;
+      let noiseSeed = numericSerial >>> 0;
+      const seededRandom = () => {
+        noiseSeed = ((noiseSeed * 1664525) + 1013904223) >>> 0;
+        return noiseSeed / 4294967296;
+      };
+
+      ctx.save();
+      for (let index = 0; index < 1150; index += 1) {
+        const tone = seededRandom() > 0.5 ? 35 : 255;
+        const alpha = 0.015 + (seededRandom() * 0.035);
+        const size = 0.5 + (seededRandom() * 1.8);
+        ctx.fillStyle = `rgba(${tone}, ${tone}, ${tone}, ${alpha})`;
+        ctx.fillRect(seededRandom() * canvas.width, seededRandom() * canvas.height, size, size);
+      }
+      ctx.restore();
+
+      const verticalFold = ctx.createLinearGradient(520, 0, 560, 0);
+      verticalFold.addColorStop(0, 'rgba(61, 53, 38, 0)');
+      verticalFold.addColorStop(0.48, 'rgba(61, 53, 38, 0.08)');
+      verticalFold.addColorStop(0.53, 'rgba(255, 255, 255, 0.15)');
+      verticalFold.addColorStop(1, 'rgba(61, 53, 38, 0)');
+      ctx.fillStyle = verticalFold;
+      ctx.fillRect(500, 0, 80, canvas.height);
+
+      ctx.strokeStyle = '#292720';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(34, 34, 1012, 1282);
+      ctx.lineWidth = 1;
+      ctx.strokeRect(47, 47, 986, 1256);
+
+      let ballotReference = null;
+      let partyEmblem = null;
+      if (includeImages) {
+        [ballotReference, partyEmblem] = await Promise.all([
+          loadShareImage('boleta.png'),
+          loadShareImage('escudo-justicialista.svg')
+        ]);
+      }
+
+      if (ballotReference) {
+        drawBallotPortrait(ctx, ballotReference, { x: 20, y: 0, width: 82, height: 105 }, 75, 72, 150, 176, 'J. D. PERÓN');
+        drawBallotPortrait(ctx, ballotReference, { x: 345, y: 4, width: 82, height: 105 }, 855, 72, 150, 176, 'EVA PERÓN');
+      } else {
+        drawPortraitPlaceholder(ctx, 75, 72, 150, 176, 'J. D. PERÓN');
+        drawPortraitPlaceholder(ctx, 855, 72, 150, 176, 'EVA PERÓN');
+      }
+
+      ctx.save();
+      ctx.fillStyle = '#211f1a';
+      ctx.textBaseline = 'middle';
+      ctx.font = '900 31px "Special Elite", "Courier Prime", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText('PARTIDO', 465, 151);
+      ctx.textAlign = 'left';
+      ctx.fillText('JUSTICIALISTA', 615, 151);
+
+      if (partyEmblem) {
+        ctx.filter = 'grayscale(1) contrast(1.35) brightness(0.82)';
+        ctx.drawImage(partyEmblem, 505, 78, 70, 105);
+      } else {
+        ctx.strokeStyle = '#211f1a';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(505, 78, 70, 105);
+      }
+      ctx.restore();
+
+      ctx.strokeStyle = '#292720';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(65, 292);
+      ctx.lineTo(1015, 292);
+      ctx.stroke();
+
+      ctx.fillStyle = '#292720';
+      ctx.textAlign = 'center';
+      ctx.font = '700 25px "Courier Prime", monospace';
+      ctx.fillText('ELECCIÓN DOCTRINARIA · REPÚBLICA ARGENTINA', 540, 333);
+      ctx.font = '900 40px "Courier Prime", monospace';
+      ctx.fillText('BOLETA DE LA CONDUCCIÓN', 540, 384);
+
+      ctx.setLineDash([8, 8]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(80, 414);
+      ctx.lineTo(1000, 414);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.font = '700 20px "Courier Prime", monospace';
+      ctx.fillText('CONSULTA FORMULADA', 540, 455);
+      drawFittedTextBlock(ctx, ticketQuestion.textContent, {
+        x: 540,
+        y: 482,
+        maxWidth: 870,
+        maxHeight: 125,
+        maxFontSize: 29,
+        minFontSize: 22,
+        fontFamily: '"Courier Prime", monospace',
+        fontWeight: '700',
+        lineHeightRatio: 1.28,
+        color: '#3a372f'
+      });
+
+      ctx.setLineDash([6, 9]);
+      ctx.beginPath();
+      ctx.moveTo(110, 630);
+      ctx.lineTo(970, 630);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#211f1a';
+      ctx.font = '900 34px "Courier Prime", monospace';
+      ctx.fillText('M E N S A J E', 540, 687);
+
+      drawFittedTextBlock(ctx, `“${ticketQuote.textContent}”`, {
+        x: 540,
+        y: 728,
+        maxWidth: 850,
+        maxHeight: 300,
+        maxFontSize: 48,
+        minFontSize: 31,
+        fontFamily: '"Playfair Display", Georgia, serif',
+        fontWeight: '800',
+        lineHeightRatio: 1.26,
+        color: '#15140f'
+      });
+
+      ctx.fillStyle = '#211f1a';
+      ctx.textAlign = 'right';
+      ctx.font = '400 25px "Special Elite", "Courier Prime", monospace';
+      ctx.fillText('— Juan Domingo Perón', 930, 1050);
+      ctx.font = '700 17px "Courier Prime", monospace';
+      ctx.fillStyle = '#4a463d';
+      ctx.fillText(ticketSource.textContent, 930, 1084);
+
+      ctx.strokeStyle = '#292720';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(65, 1133);
+      ctx.lineTo(1015, 1133);
+      ctx.stroke();
+
+      ctx.fillStyle = '#211f1a';
+      ctx.textAlign = 'center';
+      ctx.font = '700 22px "Courier Prime", monospace';
+      ctx.fillText(`LISTA N° ${ticketSerial.textContent} · DISTRITO REPÚBLICA ARGENTINA`, 540, 1184);
+      ctx.font = '700 19px "Courier Prime", monospace';
+      ctx.fillText('♪ MARCHA PERONISTA ♪', 540, 1230);
+      ctx.font = '700 17px "Special Elite", "Courier Prime", monospace';
+      ctx.fillStyle = '#4a463d';
+      ctx.fillText('PERÓN · LA MÁQUINA DE LA CONDUCCIÓN POLÍTICA', 540, 1273);
+
+      return canvas;
+    }
+
+    function exportCanvasAsJpeg(canvas) {
+      return new Promise((resolve, reject) => {
+        try {
+          canvas.toBlob(blob => {
+            if (blob) resolve(blob);
+            else reject(new Error('El navegador no pudo crear la imagen.'));
+          }, 'image/jpeg', 0.92);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+
+    async function prepareShareBallot() {
+      const preparationId = ++sharePreparationId;
+      preparedShareBlob = null;
+      ticketShareBtn.disabled = true;
+      ticketShareBtn.textContent = '⌛ PREPARANDO';
+
+      try {
+        let shareCanvas;
+        try {
+          shareCanvas = await renderShareBallot(true);
+          preparedShareBlob = await exportCanvasAsJpeg(shareCanvas);
+        } catch (imageError) {
+          shareCanvas = await renderShareBallot(false);
+          preparedShareBlob = await exportCanvasAsJpeg(shareCanvas);
+        }
+
+        if (preparationId !== sharePreparationId) return;
+        ticketShareBtn.disabled = false;
+        ticketShareBtn.textContent = '↗ COMPARTIR';
+      } catch (error) {
+        if (preparationId !== sharePreparationId) return;
+        preparedShareBlob = null;
+        ticketShareBtn.disabled = true;
+        ticketShareBtn.textContent = '⚠ NO DISPONIBLE';
+        console.warn('No se pudo preparar la boleta para compartir.', error);
+      }
+    }
+
+    function cancelSharePreparation() {
+      sharePreparationId += 1;
+      if (sharePreparationTimerId !== null) {
+        clearTimeout(sharePreparationTimerId);
+        sharePreparationTimerId = null;
+      }
+      if (shareIdleHandle !== null && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(shareIdleHandle);
+        shareIdleHandle = null;
+      }
+    }
+
+    function scheduleShareBallotPreparation() {
+      cancelSharePreparation();
+      preparedShareBlob = null;
+      ticketShareBtn.disabled = true;
+      ticketShareBtn.textContent = '⌛ PREPARANDO';
+
+      const runPreparation = () => {
+        sharePreparationTimerId = null;
+        shareIdleHandle = null;
+        prepareShareBallot();
+      };
+
+      if ('requestIdleCallback' in window) {
+        shareIdleHandle = window.requestIdleCallback(runPreparation, { timeout: 2400 });
+      } else {
+        sharePreparationTimerId = setTimeout(runPreparation, 850);
+      }
+    }
+
+    function announceShareStatus(message) {
+      if (shareNoticeTimeoutId) clearTimeout(shareNoticeTimeoutId);
+      instructionHud.classList.remove('is-muted');
+      instructionHud.textContent = message;
+      shareNoticeTimeoutId = setTimeout(() => {
+        if (slotDispenser.classList.contains('is-dispensed')) {
+          instructionHud.classList.add('is-muted');
+        }
+      }, 2600);
+    }
+
+    function downloadShareBallot(blob, filename) {
+      const objectUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = objectUrl;
+      downloadLink.download = filename;
+      downloadLink.hidden = true;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+      announceShareStatus('— SE DESCARGÓ LA BOLETA PARA QUE LA COMPARTAS —');
+    }
+
+    function shareTicket(event) {
+      if (event) event.stopPropagation();
+      if (!preparedShareBlob || ticketShareBtn.disabled) return;
+
+      const filename = `boleta-de-la-conduccion-${ticketSerial.textContent}.jpg`;
+      const shareText = `“${ticketQuote.textContent}” — Juan Domingo Perón`;
+      let shareFile = null;
+
+      if (typeof File === 'function') {
+        shareFile = new File([preparedShareBlob], filename, {
+          type: 'image/jpeg',
+          lastModified: Date.now()
+        });
+      }
+
+      let canShareImage = false;
+      if (shareFile && navigator.share && navigator.canShare) {
+        try {
+          canShareImage = navigator.canShare({ files: [shareFile] });
+        } catch (error) { }
+      }
+
+      if (!canShareImage) {
+        downloadShareBallot(preparedShareBlob, filename);
+        return;
+      }
+
+      ticketShareBtn.disabled = true;
+      ticketShareBtn.textContent = '↗ ABRIENDO';
+      navigator.share({
+        title: 'Boleta de la conducción',
+        text: shareText,
+        files: [shareFile]
+      }).then(() => {
+        announceShareStatus('— BOLETA ENTREGADA AL DISPOSITIVO, COMPAÑERO —');
+      }).catch(error => {
+        if (error && error.name === 'AbortError') return;
+        downloadShareBallot(preparedShareBlob, filename);
+      }).finally(() => {
+        ticketShareBtn.disabled = false;
+        ticketShareBtn.textContent = '↗ COMPARTIR';
+      });
+    }
+
+    /* =========================================================================
        TICKET ZOOM & NEW CONSULTATION INTERACTIONS
     ========================================================================= */
     function toggleTicketZoom(event) {
@@ -2949,6 +3325,12 @@
     function resetToNewConsultation(event) {
       if (event) event.stopPropagation();
       closeTicketZoom();
+
+      cancelSharePreparation();
+      preparedShareBlob = null;
+      ticketShareBtn.disabled = true;
+      ticketShareBtn.textContent = '↗ COMPARTIR';
+      if (shareNoticeTimeoutId) clearTimeout(shareNoticeTimeoutId);
 
       // Stop audio
       audio.stopAllMusic();
@@ -3017,6 +3399,7 @@
       ticketSource.href = QUOTE_SOURCE_URL;
       ticketQuestion.textContent = currentQuestion;
       ticketSerial.textContent = randInt(100000, 999999);
+      scheduleShareBallotPreparation();
 
       // 2. Machine activates: lamps flare & gears hum (BEHIND SMOKE!)
       setTimeout(() => {
@@ -3051,7 +3434,7 @@
           setTimeout(() => {
             slotDispenser.classList.remove('is-dispensing');
             slotDispenser.classList.add('is-dispensed', 'is-active');
-            instructionHud.textContent = '— DOCTRINA ENTREGADA — TOCÁ EL TICKET PARA AMPLIAR O CONSULTÁ DE NUEVO —';
+            instructionHud.textContent = '— DOCTRINA ENTREGADA — PODÉS AMPLIARLA, COMPARTIRLA O CONSULTAR DE NUEVO —';
             setTimeout(() => {
               if (slotDispenser.classList.contains('is-dispensed')) {
                 instructionHud.classList.add('is-muted');
@@ -3084,6 +3467,7 @@
     });
 
     ticketZoomBtn.addEventListener('click', toggleTicketZoom);
+    ticketShareBtn.addEventListener('click', shareTicket);
     ticketNewBtn.addEventListener('click', resetToNewConsultation);
     ticketCloseBadge.addEventListener('click', closeTicketZoom);
     ticketBackdrop.addEventListener('click', closeTicketZoom);
